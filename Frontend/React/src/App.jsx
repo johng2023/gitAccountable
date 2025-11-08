@@ -12,6 +12,7 @@ import MainLayout from './components/layout/MainLayout';
 import Landing from './components/pages/Landing';
 import CreateCommitment from './components/pages/CreateCommitment';
 import Dashboard from './components/pages/Dashboard';
+import Callback from './components/pages/Callback';
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ function App() {
                 <Routes>
                   <Route element={<MainLayout />}>
                     <Route path="/" element={<Landing />} />
+                    <Route path="/callback" element={<Callback />} />
                     <Route path="/create" element={<CreateCommitment />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                   </Route>

@@ -1,46 +1,28 @@
-// Mock API service - Replace with real endpoints when backend is ready
+// Simple mock API - Replace with real backend when ready
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
+// In-memory storage for demo
+const storage = {
+  commitments: {},
+  users: {},
+};
 
 export const api = {
-  // Mock user data
-  mockUsers: {
-    '0x1234567890123456789012345678901234567890': {
-      walletAddress: '0x1234567890123456789012345678901234567890',
-      githubUsername: 'test_user',
-      commitments: ['commitment_1'],
-    },
-  },
-
-  mockCommitments: {
-    commitment_1: {
-      id: 'commitment_1',
-      walletAddress: '0x1234567890123456789012345678901234567890',
-      githubUsername: 'test_user',
-      stakeAmount: '0.01',
-      status: 'active',
-      daysComplete: 3,
-      daysArray: [
-        { day: 1, status: 'complete' },
-        { day: 2, status: 'complete' },
-        { day: 3, status: 'complete' },
-        { day: 4, status: 'pending' },
-        { day: 5, status: 'pending' },
-        { day: 6, status: 'pending' },
-        { day: 7, status: 'pending' },
-      ],
-      rewards: '0.000061',
-      createdAt: Date.now() - 3 * 24 * 60 * 60 * 1000,
-      expiresAt: Date.now() + 4 * 24 * 60 * 60 * 1000,
-    },
-  },
-
   // Get user commitment
   getCommitment: async (walletAddress) => {
-    const user = api.mockUsers[walletAddress];
-    if (!user || !user.commitments.length) {
-      return null;
+    // Check localStorage first
+    const stored = localStorage.getItem(`commitment_${walletAddress}`);
+    if (stored) {
+      return JSON.parse(stored);
     }
-    const commitmentId = user.commitments[0];
-    return api.mockCommitments[commitmentId];
+    
+    // Check in-memory storage
+    const user = storage.users[walletAddress];
+    if (user?.commitmentId) {
+      return storage.commitments[user.commitmentId];
+    }
+    
+    return null;
   },
 
   // Create new commitment
@@ -59,28 +41,28 @@ export const api = {
       })),
       rewards: '0',
       createdAt: Date.now(),
-      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
     };
-    api.mockCommitments[id] = commitment;
-    api.mockUsers[walletAddress] = {
-      walletAddress,
-      githubUsername,
-      commitments: [id],
-    };
+    
+    // Save to storage
+    storage.commitments[id] = commitment;
+    storage.users[walletAddress] = { walletAddress, githubUsername, commitmentId: id };
+    localStorage.setItem(`commitment_${walletAddress}`, JSON.stringify(commitment));
+    
     return commitment;
   },
 
   // Claim rewards
   claimRewards: async (commitmentId) => {
-    const commitment = api.mockCommitments[commitmentId];
+    const commitment = storage.commitments[commitmentId] || 
+      JSON.parse(localStorage.getItem(`commitment_${commitmentId}`) || '{}');
+    
     if (commitment) {
       commitment.status = 'completed';
+      localStorage.setItem(`commitment_${commitment.walletAddress}`, JSON.stringify(commitment));
       return {
         txHash: '0x' + Math.random().toString(16).slice(2),
         rewards: commitment.rewards,
-        totalClaimed: (
-          parseFloat(commitment.stakeAmount) + parseFloat(commitment.rewards)
-        ).toString(),
+        totalClaimed: (parseFloat(commitment.stakeAmount) + parseFloat(commitment.rewards || 0)).toString(),
       };
     }
     return null;
@@ -88,14 +70,11 @@ export const api = {
 
   // Validate GitHub username
   validateGitHub: async (username) => {
-    // Mock validation - just check it's not empty
-    if (username && username.length >= 2 && username.length <= 39) {
+    // Simple validation - check format
+    if (username && /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i.test(username)) {
       return {
         valid: true,
-        user: {
-          username,
-          avatarUrl: `https://avatars.githubusercontent.com/u/1?v=4`,
-        },
+        user: { username },
       };
     }
     return { valid: false, user: null };

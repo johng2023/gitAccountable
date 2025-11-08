@@ -5,7 +5,7 @@ export default function Header() {
   return (
     <header>
       <Link to="/" className="logo">
-        CommitLock
+        GitAccountable
       </Link>
       <ConnectButton />
     </header>

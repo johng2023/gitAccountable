@@ -1,16 +1,33 @@
-# React + Vite
+# GitAccountable
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Stake eETH on your daily GitHub commits. Complete 7 days and earn staking rewards. Miss even one day and forfeit your stake.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Connect multiple wallets (MetaMask, Coinbase, Phantom, WalletConnect, and more)
+- Create commitments with GitHub username
+- Track daily progress
+- Claim rewards after 7 days
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React + Vite
+- Wagmi + RainbowKit for wallet connections
+- Tailwind CSS for styling
 
-## Expanding the ESLint configuration
+## Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Start dev server:
+```bash
+npm run dev
+```
+
+3. Build for production:
+```bash
+npm run build
+```

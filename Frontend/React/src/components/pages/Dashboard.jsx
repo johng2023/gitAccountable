@@ -2,8 +2,6 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../common/Button';
 import Card from '../common/Card';
-import Badge from '../common/Badge';
-import ProgressBar from '../common/ProgressBar';
 import { useApp } from '../../context/AppContext';
 import { useWallet } from '../../context/WalletContext';
 import { useCommitment } from '../../hooks/useCommitment';
@@ -15,20 +13,50 @@ export default function Dashboard() {
   const { commitment, setCommitment } = useApp();
   const { getCommitment, claimRewards, isLoading } = useCommitment();
 
+  // Fetch commitment when address is available
   useEffect(() => {
-    if (address && !commitment) {
-      getCommitment(address).then(setCommitment);
+    if (!address) {
+      // No wallet connected, redirect to landing
+      navigate('/');
+      return;
     }
-  }, [address, commitment, getCommitment, setCommitment]);
 
-  if (!commitment) {
+    // Only fetch if we don't already have a commitment
+    if (!commitment) {
+      getCommitment(address).then((data) => {
+        if (data) {
+          setCommitment(data);
+        } else {
+          // No commitment found, redirect to create form
+          navigate('/create');
+        }
+      }).catch(() => {
+        // Error fetching commitment, redirect to create form
+        navigate('/create');
+      });
+    }
+  }, [address, commitment, getCommitment, setCommitment, navigate]);
+
+  // Show loading state while checking for commitment
+  if (!address) {
     return (
       <div className="page-container">
         <div className="content-width text-center">
-          <p>No active commitment found</p>
-          <Button onClick={() => navigate('/create')} className="mt-6">
-            Create New Commitment
+          <p>Please connect your wallet</p>
+          <Button onClick={() => navigate('/')} className="mt-6">
+            Go to Home
           </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!commitment) {
+    // This should redirect to /create, but show a message just in case
+    return (
+      <div className="page-container">
+        <div className="content-width text-center">
+          <p>No active commitment found. Redirecting...</p>
         </div>
       </div>
     );
@@ -56,9 +84,10 @@ export default function Dashboard() {
               <p className="label">GitHub Username</p>
               <h2>@{commitment.githubUsername}</h2>
             </div>
-            <Badge status={commitment.status}>
-              {commitment.status.charAt(0).toUpperCase() + commitment.status.slice(1)}
-            </Badge>
+            <div>
+              <p className="label">Status</p>
+              <p className="value">{commitment.status.charAt(0).toUpperCase() + commitment.status.slice(1)}</p>
+            </div>
           </div>
 
           <div className="grid-2 pt-6 border-top">
@@ -70,15 +99,14 @@ export default function Dashboard() {
               <p className="label">Wallet</p>
               <p className="value mono">{formatAddress(commitment.walletAddress)}</p>
             </div>
+            <div>
+              <p className="label">Progress</p>
+              <p className="value">{commitment.daysComplete}/7 days complete</p>
+            </div>
           </div>
         </Card>
 
-        {/* Progress Section */}
-        <Card className="mb-8">
-          <ProgressBar current={commitment.daysComplete} total={7} />
-        </Card>
-
-        {/* 7-Day Grid */}
+        {/* Daily Progress */}
         <Card className="mb-8">
           <h3>Daily Progress</h3>
           <div className="grid-7">
@@ -99,22 +127,22 @@ export default function Dashboard() {
           </div>
         </Card>
 
-        {/* Rewards Card */}
+        {/* Rewards */}
         <Card className="mb-8">
-          <h3>Rewards Summary</h3>
+          <h3>Rewards</h3>
           <div className="details-grid">
             <div className="detail-row">
-              <span>Original Stake</span>
+              <span>Stake</span>
               <span className="detail-value">{commitment.stakeAmount} eETH</span>
             </div>
             <div className="detail-row">
-              <span>Accrued Rewards</span>
-              <span className="detail-value earnings">{commitment.rewards} eETH</span>
+              <span>Rewards</span>
+              <span className="detail-value earnings">{commitment.rewards || '0'} eETH</span>
             </div>
             <div className="detail-row detail-divider">
-              <span className="detail-bold">Total to Claim</span>
+              <span className="detail-bold">Total</span>
               <span className="detail-value detail-bold">
-                {(parseFloat(commitment.stakeAmount) + parseFloat(commitment.rewards)).toFixed(6)} eETH
+                {(parseFloat(commitment.stakeAmount) + parseFloat(commitment.rewards || 0)).toFixed(6)} eETH
               </span>
             </div>
           </div>

@@ -1,25 +1,39 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Button from '../common/Button';
-import Input from '../common/Input';
-import Card from '../common/Card';
-import { useGitHub } from '../../hooks/useGitHub';
-import { useCommitment } from '../../hooks/useCommitment';
-import { useWallet } from '../../context/WalletContext';
-import { useApp } from '../../context/AppContext';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Button from "../common/Button";
+import Input from "../common/Input";
+import Card from "../common/Card";
+import { useGitHub } from "../../hooks/useGitHub";
+import { useCommitment } from "../../hooks/useCommitment";
+import { useWallet } from "../../context/WalletContext";
+import { useApp } from "../../context/AppContext";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export default function CreateCommitment() {
   const navigate = useNavigate();
-  const { address } = useWallet();
-  const { setUser, setCommitment } = useApp();
+  const { address, isConnected } = useWallet();
+  const { setUser, setCommitment, commitment } = useApp();
   const { validateUsername, isLoading: gitHubLoading } = useGitHub();
   const { createCommitment, isLoading: commitLoading } = useCommitment();
 
-  const [username, setUsername] = useState('');
+  // Redirect to dashboard if commitment already exists
+  useEffect(() => {
+    if (commitment) {
+      navigate("/dashboard");
+    }
+  }, [commitment, navigate]);
+
+  // Redirect to home if wallet is not connected
+  useEffect(() => {
+    if (!isConnected) {
+      navigate("/");
+    }
+  }, [isConnected, navigate]);
+
+  const [username, setUsername] = useState("");
   const [validationError, setValidationError] = useState(null);
   const [isValid, setIsValid] = useState(false);
   const [approvalDone, setApprovalDone] = useState(false);
-  const [step, setStep] = useState(1);
 
   const handleUsernameChange = async (e) => {
     const value = e.target.value;
@@ -32,52 +46,63 @@ export default function CreateCommitment() {
       if (valid) {
         setIsValid(true);
       } else {
-        setValidationError('Invalid GitHub username');
+        setValidationError("Invalid GitHub username");
       }
     }
   };
 
   const handleApprove = async () => {
     // Mock approval - in real app, this calls smart contract
-    setStep(2);
     setApprovalDone(true);
   };
 
   const handleLockIn = async () => {
     if (!isValid) {
-      setValidationError('Please validate GitHub username first');
+      setValidationError("Please validate GitHub username first");
       return;
     }
 
-    const result = await createCommitment(address, username, '0.01');
+    const result = await createCommitment(address, username, "0.01");
     if (result) {
       setUser({ githubUsername: username, walletAddress: address });
       setCommitment(result);
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   };
+
+  // Show connect wallet message if not connected
+  if (!isConnected) {
+    return (
+      <div className="page-container">
+        <div className="content-width text-center">
+          <h1>Connect Your Wallet</h1>
+          <p className="mb-6">
+            Please connect your wallet to create a commitment
+          </p>
+          <div className="connect-wallet-wrapper">
+            <ConnectButton />
+          </div>
+          <Button
+            onClick={() => navigate("/")}
+            className="mt-6"
+            variant="ghost"
+          >
+            ← Back to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container">
       <div className="content-width">
         <div className="page-nav">
-          <button onClick={() => navigate('/')} className="link-button">← Back to Home</button>
+          <button onClick={() => navigate("/")} className="link-button">
+            ← Back to Home
+          </button>
         </div>
         <h1>Create Commitment</h1>
-
-        {/* Step Indicator */}
-        <div className="step-indicator">
-          {[1, 2, 3].map((num) => (
-            <div key={num} className={step >= num ? 'step active' : 'step'}>
-              <p className="step-label">Step {num}</p>
-              <p className="step-desc">
-                {num === 1 && 'Approve eETH'}
-                {num === 2 && 'Confirm & Lock'}
-                {num === 3 && 'View Dashboard'}
-              </p>
-            </div>
-          ))}
-        </div>
 
         {/* Form Card */}
         <Card className="mb-8">
@@ -104,35 +129,23 @@ export default function CreateCommitment() {
               <span>Duration:</span>
               <span className="detail-value">7 days</span>
             </div>
-            <div className="detail-row">
-              <span>Estimated APY:</span>
-              <span className="detail-value">~3.2%</span>
-            </div>
-            <div className="detail-row detail-divider">
-              <span>Estimated Earnings:</span>
-              <span className="detail-value earnings">~0.000061 eETH</span>
-            </div>
           </div>
-        </Card>
-
-        {/* Warning Box */}
-        <Card className="warning-box mb-8">
-          <p>
-            Your funds will be locked for 7 days. You must make at least 1 GitHub commit per day
-            to claim rewards. Missing even one day will result in losing your stake.
+          <p className="mt-4 text-sm text-gray-500">
+            Make at least 1 GitHub commit per day for 7 days to earn rewards.
+            Missing a day will forfeit your stake.
           </p>
         </Card>
 
         {/* Action Buttons */}
         <div className="button-group">
           <Button
-            variant={approvalDone ? 'ghost' : 'secondary'}
+            variant={approvalDone ? "ghost" : "secondary"}
             size="lg"
             onClick={handleApprove}
             disabled={!isValid || approvalDone}
             className="flex-1"
           >
-            {approvalDone ? 'Approved' : 'Approve eETH'}
+            {approvalDone ? "Approved" : "Approve eETH"}
           </Button>
           <Button
             size="lg"
@@ -140,7 +153,7 @@ export default function CreateCommitment() {
             disabled={!approvalDone || commitLoading}
             className="flex-1"
           >
-            {commitLoading ? 'Locking...' : 'Lock It In'}
+            {commitLoading ? "Locking..." : "Lock It In"}
           </Button>
         </div>
       </div>

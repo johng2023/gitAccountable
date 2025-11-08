@@ -34,8 +34,8 @@ export const CONTRACTS = {
       },
     ],
   },
-  CommitLock: {
-    address: process.env.VITE_COMMITLOCK_ADDRESS || '',
+  GitAccountable: {
+    address: process.env.VITE_GITACCOUNTABLE_ADDRESS || '',
     abi: [
       // Will be updated after smart contract deployment
       {

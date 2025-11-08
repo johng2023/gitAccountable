@@ -1,22 +1,21 @@
-import { http, createConfig } from 'wagmi';
 import { sepolia } from 'wagmi/chains';
-import { metaMask, walletConnect, coinbaseWallet, injected } from 'wagmi/connectors';
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 
-export const wagmiConfig = createConfig({
+const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'test_project_id';
+
+// Use RainbowKit's getDefaultConfig which automatically includes many wallets
+// This will show all available wallets including Phantom, MetaMask, Coinbase, Trust, etc.
+// RainbowKit automatically detects injected wallets (like Phantom when it's installed)
+export const wagmiConfig = getDefaultConfig({
+  appName: 'GitAccountable',
+  projectId: projectId,
   chains: [sepolia],
-  connectors: [
-    injected(),
-    metaMask(),
-    walletConnect({
-      projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'test_project_id',
-    }),
-    coinbaseWallet({
-      appName: 'GitAccountable',
-    }),
-  ],
-  transports: {
-    [sepolia.id]: http(),
-  },
+  // getDefaultConfig automatically includes:
+  // - MetaMask
+  // - Coinbase Wallet
+  // - WalletConnect
+  // - Injected wallets (Phantom, Trust, etc. when installed)
+  // - And many more
 });
 
 export const SEPOLIA_CHAIN_ID = 11155111;
