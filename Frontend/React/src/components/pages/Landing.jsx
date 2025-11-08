@@ -59,9 +59,11 @@ export default function Landing() {
             >
               Login with GitHub
             </Button>
-            <Button size="lg" onClick={() => navigate("/create")}>
-              Connect Wallet To Get Started
-            </Button>
+
+            <ConnectButton
+              onClick={() => navigate("/create")}
+              label="Connect Wallet To Get Started"
+            ></ConnectButton>
           </div>
         ) : (
           <div className="button-group">
