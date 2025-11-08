@@ -1,0 +1,23 @@
+{
+  "chainlinkFunctions": {
+    "network": "sepolia",
+    "subscriptionId": "YOUR_SUBSCRIPTION_ID_HERE",
+    "donId": "fun-ethereum-sepolia-1",
+    "gasLimit": 300000,
+    "version": 1
+  },
+  "github": {
+    "apiBaseUrl": "https://api.github.com",
+    "eventsEndpoint": "/users/{username}/events",
+    "rateLimit": {
+      "unauthenticated": 60,
+      "authenticated": 5000
+    }
+  },
+  "commitLock": {
+    "contractAddress": "YOUR_COMMIT_LOCK_ADDRESS_HERE",
+    "network": "sepolia",
+    "stakeAmount": "0.01",
+    "duration": 7
+  }
+}
