@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export default function Header() {
   return (
@@ -6,10 +7,7 @@ export default function Header() {
       <Link to="/" className="text-2xl font-bold text-blue-500">
         CommitLock
       </Link>
-      <div>
-        {/* Wallet button will be added in MainLayout */}
-        <p className="text-slate-400 text-sm">Wallet Connect Button Here</p>
-      </div>
+      <ConnectButton />
     </header>
   );
 }
