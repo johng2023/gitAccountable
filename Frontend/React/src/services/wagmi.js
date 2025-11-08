@@ -1,10 +1,11 @@
 import { http, createConfig } from 'wagmi';
 import { sepolia } from 'wagmi/chains';
-import { metaMask, walletConnect, coinbaseWallet } from 'wagmi/connectors';
+import { metaMask, walletConnect, coinbaseWallet, injected } from 'wagmi/connectors';
 
 export const wagmiConfig = createConfig({
   chains: [sepolia],
   connectors: [
+    injected(),
     metaMask(),
     walletConnect({
       projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'test_project_id',

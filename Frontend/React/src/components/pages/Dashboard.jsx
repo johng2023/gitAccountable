@@ -44,6 +44,9 @@ export default function Dashboard() {
   return (
     <div className="page-container">
       <div className="content-width">
+        <div className="page-nav">
+          <button onClick={() => navigate('/')} className="link-button">← Back to Home</button>
+        </div>
         <h1>Dashboard</h1>
 
         {/* Status Card */}

@@ -18,7 +18,14 @@ export default function Landing() {
         </p>
 
         <div className="button-group">
-          <Button variant="secondary" size="lg">
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={() => {
+              // GitHub OAuth - redirect to GitHub auth endpoint
+              window.location.href = `https://github.com/login/oauth/authorize?client_id=${import.meta.env.VITE_GITHUB_CLIENT_ID || 'your_client_id'}&redirect_uri=${window.location.origin}/callback&scope=user`;
+            }}
+          >
             Login with GitHub
           </Button>
           <Button
@@ -30,13 +37,22 @@ export default function Landing() {
         </div>
 
         {isConnected && (
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/dashboard')}
-            className="ghost-action"
-          >
-            Go to Dashboard
-          </Button>
+          <div className="button-group">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/create')}
+              className="ghost-action"
+            >
+              Create New Commitment
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/dashboard')}
+              className="ghost-action"
+            >
+              Go to Dashboard
+            </Button>
+          </div>
         )}
       </div>
 

@@ -391,6 +391,29 @@ input:valid {
   padding-bottom: 40px;
 }
 
+/* Page Navigation */
+.page-nav {
+  margin-bottom: 20px;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: all 200ms ease;
+  font-family: inherit;
+}
+
+.link-button:hover {
+  background: rgba(59, 130, 246, 0.1);
+  transform: translateX(-4px);
+}
+
 .content-width {
   max-width: 800px;
   margin: 0 auto;
@@ -402,6 +425,8 @@ input:valid {
   font-weight: 700;
   margin-bottom: 30px;
   color: #f1f5f9;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #3b82f6;
 }
 
 .text-center {

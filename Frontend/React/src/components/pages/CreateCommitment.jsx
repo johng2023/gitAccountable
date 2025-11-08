@@ -60,6 +60,9 @@ export default function CreateCommitment() {
   return (
     <div className="page-container">
       <div className="content-width">
+        <div className="page-nav">
+          <button onClick={() => navigate('/')} className="link-button">← Back to Home</button>
+        </div>
         <h1>Create Commitment</h1>
 
         {/* Step Indicator */}
