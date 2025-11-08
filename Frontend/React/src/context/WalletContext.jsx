@@ -1,16 +1,16 @@
 import { createContext, useContext } from 'react';
-import { useAccount, useNetwork } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 const WalletContext = createContext();
 
 export function WalletProvider({ children }) {
   const { address, isConnected } = useAccount();
-  const { chain } = useNetwork();
+  const chainId = useChainId();
 
   const value = {
     address,
     isConnected,
-    chain: chain || { id: 11155111, name: 'Sepolia' },
+    chain: { id: chainId || 11155111, name: 'Sepolia' },
   };
 
   return (

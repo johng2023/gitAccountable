@@ -1,33 +1,21 @@
-import { configureChains, createConfig } from 'wagmi';
+import { http, createConfig } from 'wagmi';
 import { sepolia } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
-
-const { chains, publicClient } = configureChains(
-  [sepolia],
-  [publicProvider()]
-);
+import { metaMask, walletConnect, coinbaseWallet } from 'wagmi/connectors';
 
 export const wagmiConfig = createConfig({
-  autoConnect: true,
+  chains: [sepolia],
   connectors: [
-    new MetaMaskConnector({ chains }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        projectId: process.env.VITE_WALLETCONNECT_PROJECT_ID || 'test_project_id',
-      },
+    metaMask(),
+    walletConnect({
+      projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'test_project_id',
     }),
-    new CoinbaseWalletConnector({
-      chains,
-      options: {
-        appName: 'GitAccountable',
-      },
+    coinbaseWallet({
+      appName: 'GitAccountable',
     }),
   ],
-  publicClient,
+  transports: {
+    [sepolia.id]: http(),
+  },
 });
 
 export const SEPOLIA_CHAIN_ID = 11155111;

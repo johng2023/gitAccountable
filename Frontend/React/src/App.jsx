@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { WagmiConfig } from 'wagmi';
+import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -12,25 +13,29 @@ import Landing from './components/pages/Landing';
 import CreateCommitment from './components/pages/CreateCommitment';
 import Dashboard from './components/pages/Dashboard';
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
-    <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider>
-        <WalletProvider>
-          <AppProvider>
-            <Router>
-              <Routes>
-                <Route element={<MainLayout />}>
-                  <Route path="/" element={<Landing />} />
-                  <Route path="/create" element={<CreateCommitment />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                </Route>
-              </Routes>
-            </Router>
-          </AppProvider>
-        </WalletProvider>
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider>
+          <WalletProvider>
+            <AppProvider>
+              <Router>
+                <Routes>
+                  <Route element={<MainLayout />}>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/create" element={<CreateCommitment />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                  </Route>
+                </Routes>
+              </Router>
+            </AppProvider>
+          </WalletProvider>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 
