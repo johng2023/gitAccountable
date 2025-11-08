@@ -23,11 +23,13 @@ export default function Dashboard() {
 
   if (!commitment) {
     return (
-      <div className="min-h-screen bg-slate-900 pt-24 text-center">
-        <p className="text-white text-xl">No active commitment found</p>
-        <Button onClick={() => navigate('/create')} className="mt-6">
-          Create New Commitment
-        </Button>
+      <div className="page-container">
+        <div className="content-width text-center">
+          <p>No active commitment found</p>
+          <Button onClick={() => navigate('/create')} className="mt-6">
+            Create New Commitment
+          </Button>
+        </div>
       </div>
     );
   }
@@ -40,30 +42,30 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 pt-24 pb-12">
-      <div className="max-w-4xl mx-auto px-6">
-        <h1 className="text-4xl font-bold text-white mb-12">Dashboard</h1>
+    <div className="page-container">
+      <div className="content-width">
+        <h1>Dashboard</h1>
 
         {/* Status Card */}
         <Card className="mb-8">
-          <div className="flex justify-between items-start mb-6">
+          <div className="card-header">
             <div>
-              <p className="text-slate-400 text-sm mb-2">GitHub Username</p>
-              <h2 className="text-2xl font-bold text-white">@{commitment.githubUsername}</h2>
+              <p className="label">GitHub Username</p>
+              <h2>@{commitment.githubUsername}</h2>
             </div>
             <Badge status={commitment.status}>
               {commitment.status.charAt(0).toUpperCase() + commitment.status.slice(1)}
             </Badge>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-700">
+          <div className="grid-2 pt-6 border-top">
             <div>
-              <p className="text-slate-400 text-sm mb-1">Stake Amount</p>
-              <p className="text-xl font-bold text-white">{commitment.stakeAmount} eETH</p>
+              <p className="label">Stake Amount</p>
+              <p className="value">{commitment.stakeAmount} eETH</p>
             </div>
             <div>
-              <p className="text-slate-400 text-sm mb-1">Wallet</p>
-              <p className="text-sm font-mono text-blue-400">{formatAddress(commitment.walletAddress)}</p>
+              <p className="label">Wallet</p>
+              <p className="value mono">{formatAddress(commitment.walletAddress)}</p>
             </div>
           </div>
         </Card>
@@ -75,18 +77,18 @@ export default function Dashboard() {
 
         {/* 7-Day Grid */}
         <Card className="mb-8">
-          <h3 className="text-lg font-bold text-white mb-6">Daily Progress</h3>
-          <div className="grid grid-cols-7 gap-3">
+          <h3>Daily Progress</h3>
+          <div className="grid-7">
             {commitment.daysArray.map((day) => (
               <div
                 key={day.day}
-                className={`p-4 rounded-lg text-center font-semibold ${
+                className={
                   day.status === 'complete'
-                    ? 'bg-green-600 text-white'
+                    ? 'day-box day-complete'
                     : day.status === 'pending'
-                    ? 'bg-amber-500 text-slate-900'
-                    : 'bg-red-600 text-white'
-                }`}
+                    ? 'day-box day-pending'
+                    : 'day-box day-missed'
+                }
               >
                 Day {day.day}
               </div>
@@ -96,19 +98,19 @@ export default function Dashboard() {
 
         {/* Rewards Card */}
         <Card className="mb-8">
-          <h3 className="text-lg font-bold text-white mb-6">Rewards Summary</h3>
-          <div className="space-y-4">
-            <div className="flex justify-between text-slate-300">
+          <h3>Rewards Summary</h3>
+          <div className="details-grid">
+            <div className="detail-row">
               <span>Original Stake</span>
-              <span className="font-semibold text-white">{commitment.stakeAmount} eETH</span>
+              <span className="detail-value">{commitment.stakeAmount} eETH</span>
             </div>
-            <div className="flex justify-between text-slate-300">
+            <div className="detail-row">
               <span>Accrued Rewards</span>
-              <span className="font-semibold text-green-400">{commitment.rewards} eETH</span>
+              <span className="detail-value earnings">{commitment.rewards} eETH</span>
             </div>
-            <div className="border-t border-slate-700 pt-4 flex justify-between text-white">
-              <span className="font-bold">Total to Claim</span>
-              <span className="font-bold text-lg">
+            <div className="detail-row detail-divider">
+              <span className="detail-bold">Total to Claim</span>
+              <span className="detail-value detail-bold">
                 {(parseFloat(commitment.stakeAmount) + parseFloat(commitment.rewards)).toFixed(6)} eETH
               </span>
             </div>
@@ -116,7 +118,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Action Button */}
-        <div className="flex gap-4">
+        <div className="button-group">
           {commitment.status === 'completed' && (
             <Button
               size="lg"
@@ -128,12 +130,12 @@ export default function Dashboard() {
             </Button>
           )}
           {commitment.status === 'failed' && (
-            <div className="w-full p-4 bg-red-900 text-red-200 rounded-lg text-center">
+            <div className="error-box">
               Challenge Failed - Your stake has been forfeited
             </div>
           )}
           {commitment.status === 'active' && (
-            <p className="text-slate-400 italic">Keep up with your daily commits to complete the challenge</p>
+            <p className="info-text">Keep up with your daily commits to complete the challenge</p>
           )}
         </div>
       </div>

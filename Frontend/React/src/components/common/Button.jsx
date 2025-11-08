@@ -7,21 +7,19 @@ export default function Button({
   className = '',
   type = 'button',
 }) {
-  const baseClasses = 'font-semibold rounded transition-all duration-200 cursor-pointer';
+  const variantClass = {
+    primary: 'btn-primary',
+    secondary: 'btn-secondary',
+    ghost: 'btn-ghost',
+  }[variant];
 
-  const variantClasses = {
-    primary: 'bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50',
-    secondary: 'bg-slate-800 text-blue-400 border border-blue-500 hover:bg-slate-700',
-    ghost: 'text-blue-400 hover:underline',
-  };
+  const sizeClass = {
+    sm: 'btn-sm',
+    md: 'btn',
+    lg: 'btn-lg',
+  }[size];
 
-  const sizeClasses = {
-    sm: 'px-4 py-2 text-sm',
-    md: 'px-8 py-3 text-base',
-    lg: 'px-10 py-4 text-lg',
-  };
-
-  const finalClass = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
+  const finalClass = `${variantClass} ${sizeClass} ${className}`;
 
   return (
     <button

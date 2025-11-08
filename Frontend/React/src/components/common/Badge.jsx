@@ -1,13 +1,13 @@
 export default function Badge({ status, children }) {
-  const statusClasses = {
-    active: 'bg-green-600 text-white',
-    completed: 'bg-green-600 text-white',
-    failed: 'bg-red-600 text-white',
-    pending: 'bg-amber-500 text-slate-900',
-  };
+  const badgeClass = {
+    active: 'badge badge-active',
+    completed: 'badge badge-completed',
+    failed: 'badge badge-failed',
+    pending: 'badge badge-pending',
+  }[status];
 
   return (
-    <span className={`px-3 py-1 rounded text-sm font-semibold ${statusClasses[status]}`}>
+    <span className={badgeClass}>
       {children}
     </span>
   );

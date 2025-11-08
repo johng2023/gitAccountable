@@ -58,23 +58,16 @@ export default function CreateCommitment() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 pt-24 pb-12">
-      <div className="max-w-2xl mx-auto px-6">
-        <h1 className="text-4xl font-bold text-white mb-12">Create Commitment</h1>
+    <div className="page-container">
+      <div className="content-width">
+        <h1>Create Commitment</h1>
 
         {/* Step Indicator */}
-        <div className="flex justify-between mb-12">
+        <div className="step-indicator">
           {[1, 2, 3].map((num) => (
-            <div
-              key={num}
-              className={`flex-1 text-center pb-4 border-b-2 ${
-                step >= num ? 'border-blue-500' : 'border-slate-700'
-              }`}
-            >
-              <p className={`font-semibold ${step >= num ? 'text-blue-400' : 'text-slate-500'}`}>
-                Step {num}
-              </p>
-              <p className="text-xs text-slate-400 mt-1">
+            <div key={num} className={step >= num ? 'step active' : 'step'}>
+              <p className="step-label">Step {num}</p>
+              <p className="step-desc">
                 {num === 1 && 'Approve eETH'}
                 {num === 2 && 'Confirm & Lock'}
                 {num === 3 && 'View Dashboard'}
@@ -85,7 +78,7 @@ export default function CreateCommitment() {
 
         {/* Form Card */}
         <Card className="mb-8">
-          <h2 className="text-xl font-bold text-white mb-6">GitHub Information</h2>
+          <h2>GitHub Information</h2>
           <Input
             placeholder="GitHub username"
             value={username}
@@ -98,37 +91,37 @@ export default function CreateCommitment() {
 
         {/* Stake Details Card */}
         <Card className="mb-8">
-          <h2 className="text-xl font-bold text-white mb-4">Stake Details</h2>
-          <div className="space-y-3 text-slate-300">
-            <div className="flex justify-between">
+          <h2>Stake Details</h2>
+          <div className="details-grid">
+            <div className="detail-row">
               <span>Stake Amount:</span>
-              <span className="font-semibold text-white">0.01 eETH</span>
+              <span className="detail-value">0.01 eETH</span>
             </div>
-            <div className="flex justify-between">
+            <div className="detail-row">
               <span>Duration:</span>
-              <span className="font-semibold text-white">7 days</span>
+              <span className="detail-value">7 days</span>
             </div>
-            <div className="flex justify-between">
+            <div className="detail-row">
               <span>Estimated APY:</span>
-              <span className="font-semibold text-white">~3.2%</span>
+              <span className="detail-value">~3.2%</span>
             </div>
-            <div className="border-t border-slate-700 pt-3 flex justify-between">
+            <div className="detail-row detail-divider">
               <span>Estimated Earnings:</span>
-              <span className="font-semibold text-green-400">~0.000061 eETH</span>
+              <span className="detail-value earnings">~0.000061 eETH</span>
             </div>
           </div>
         </Card>
 
         {/* Warning Box */}
-        <Card className="mb-8 bg-amber-900 border-amber-700">
-          <p className="text-amber-200 text-sm">
+        <Card className="warning-box mb-8">
+          <p>
             Your funds will be locked for 7 days. You must make at least 1 GitHub commit per day
             to claim rewards. Missing even one day will result in losing your stake.
           </p>
         </Card>
 
         {/* Action Buttons */}
-        <div className="flex gap-4">
+        <div className="button-group">
           <Button
             variant={approvalDone ? 'ghost' : 'secondary'}
             size="lg"

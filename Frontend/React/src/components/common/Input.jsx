@@ -8,31 +8,20 @@ export default function Input({
   disabled = false,
   className = '',
 }) {
-  const baseClasses = 'w-full px-4 py-3 rounded border transition-colors duration-200';
-
-  let borderColor = 'border-slate-700 focus:border-blue-500';
-  if (error) {
-    borderColor = 'border-red-500 focus:border-red-600';
-  } else if (success) {
-    borderColor = 'border-green-500 focus:border-green-600';
-  }
-
-  const finalClass = `${baseClasses} ${borderColor} bg-slate-800 text-white placeholder-slate-500 ${
-    disabled ? 'opacity-50 cursor-not-allowed' : ''
-  } ${className}`;
+  const inputClass = error ? 'input error' : success ? 'input success' : 'input';
 
   return (
-    <div className="w-full">
+    <div className="input-wrapper">
       <input
         type={type}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className={finalClass}
+        className={`${inputClass} ${className}`}
       />
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-      {success && <p className="text-green-500 text-sm mt-2">Valid</p>}
+      {error && <p className="error-text">{error}</p>}
+      {success && <p className="success-text">Valid</p>}
     </div>
   );
 }
