@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
+import { motion } from 'framer-motion';
 import { useCreateCommitment } from '../hooks/useCreateCommitment';
 import { useIsCommitmentActive } from '../hooks/useCommitment';
 import { useGitHubAuth } from '../hooks/useGitHubAuth';
@@ -43,39 +44,79 @@ export default function CreateCommitment() {
     createCommitment(effectiveUsername.trim());
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: 'easeOut' },
+    },
+  };
+
   // If user already has active commitment
   if (isActive) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-6 text-center">
-          <h2 className="text-2xl font-bold mb-4 text-yellow-400">
-            You Already Have an Active Commitment
-          </h2>
-          <p className="text-gray-300 mb-6">
-            You can only have one commitment at a time. Check your dashboard to view your progress.
-          </p>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+      <motion.div
+        className="bg-slate-900 min-h-screen"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="max-w-2xl mx-auto px-6 py-12">
+          <motion.div
+            className="bg-orange-500/10 border border-orange-500/50 rounded-lg p-8 text-center"
+            whileHover={{ scale: 1.02 }}
           >
-            Go to Dashboard
-          </button>
+            <h2 className="text-2xl font-bold mb-4 text-orange-400">
+              You Already Have an Active Commitment
+            </h2>
+            <p className="text-slate-300 mb-6">
+              You can only have one commitment at a time. Check your dashboard to view your progress.
+            </p>
+            <motion.button
+              onClick={() => navigate('/dashboard')}
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Go to Dashboard
+            </motion.button>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-8">
-        <h1 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-          Create Commitment
-        </h1>
+    <motion.div
+      className="bg-slate-900 min-h-screen"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <div className="max-w-2xl mx-auto px-6 py-12">
+        <motion.div
+          className="border border-slate-700 rounded-lg p-8"
+          variants={itemVariants}
+        >
+          <h1 className="text-3xl font-bold mb-8 text-center text-white">
+            Start Your Accountability Journey
+          </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <motion.form onSubmit={handleSubmit} className="space-y-6">
           {/* GitHub Connection Section */}
-          <div>
-            <label className="block text-sm font-medium mb-3">
+          <motion.div variants={itemVariants}>
+            <label className="block text-sm font-medium text-slate-300 mb-3">
               GitHub Account
             </label>
 
@@ -88,16 +129,16 @@ export default function CreateCommitment() {
 
             {/* If GitHub connected, show username (read-only) */}
             {isGitHubConnected && githubData && !manualEntry ? (
-              <div className="bg-green-900/20 border border-green-700 rounded-lg p-4">
+              <div className="bg-emerald-500/10 border border-emerald-500 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-400 mb-1">Tracking commits from:</p>
+                    <p className="text-sm text-slate-400 mb-1">Tracking commits from:</p>
                     <p className="text-xl font-bold text-white">{githubData.username}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setManualEntry(true)}
-                    className="text-sm text-blue-400 hover:text-blue-300"
+                    className="text-sm text-orange-400 hover:text-orange-300"
                   >
                     Enter manually
                   </button>
@@ -112,18 +153,18 @@ export default function CreateCommitment() {
                   value={githubUsername}
                   onChange={(e) => setGithubUsername(e.target.value)}
                   placeholder="octocat"
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-orange-500 text-white placeholder-slate-500"
                   disabled={isPending || isConfirming}
                 />
                 <div className="flex items-center justify-between mt-2">
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-slate-500 text-sm">
                     We'll track commits from this GitHub account
                   </p>
                   {isGitHubConnected && manualEntry && (
                     <button
                       type="button"
                       onClick={() => setManualEntry(false)}
-                      className="text-sm text-blue-400 hover:text-blue-300"
+                      className="text-sm text-orange-400 hover:text-orange-300"
                     >
                       Use connected account
                     </button>
@@ -131,69 +172,72 @@ export default function CreateCommitment() {
                 </div>
               </div>
             )}
-          </div>
+          </motion.div>
 
           {/* Commitment Details */}
-          <div className="bg-gray-900/50 rounded-lg p-6 space-y-4">
+          <motion.div className="bg-slate-800/30 border border-slate-700 rounded-lg p-6 space-y-4" variants={itemVariants}>
             <div className="flex justify-between">
-              <span className="text-gray-400">Stake Amount:</span>
-              <span className="font-semibold">{STAKE_AMOUNT} ETH</span>
+              <span className="text-slate-400">Stake Amount:</span>
+              <span className="font-semibold text-white">{STAKE_AMOUNT} ETH</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Duration:</span>
-              <span className="font-semibold">{DURATION_DAYS} days</span>
+              <span className="text-slate-400">Duration:</span>
+              <span className="font-semibold text-white">{DURATION_DAYS} days</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Integration:</span>
-              <span className="font-semibold">Ether.Fi eETH</span>
+              <span className="text-slate-400">Integration:</span>
+              <span className="font-semibold text-white">Ether.Fi eETH</span>
             </div>
-            <div className="pt-4 border-t border-gray-700">
-              <p className="text-sm text-gray-400">
+            <div className="pt-4 border-t border-slate-700">
+              <p className="text-sm text-slate-300">
                 💡 <strong>Earn while you build:</strong> Your ETH will be staked through Ether.Fi to earn eETH rewards during the 7-day period!
               </p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Warning */}
-          <div className="bg-red-900/20 border border-red-700 rounded-lg p-4">
+          <motion.div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4" variants={itemVariants}>
             <p className="text-sm text-red-400">
               ⚠️ <strong>Important:</strong> You must make at least one GitHub commit every day for 7 consecutive days.
               Missing even one day will result in forfeiting your entire stake (including rewards) to the contract owner.
             </p>
-          </div>
+          </motion.div>
 
           {/* Submit Button */}
-          <button
+          <motion.button
             type="submit"
             disabled={isPending || isConfirming || !effectiveUsername.trim()}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
+            className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors disabled:cursor-not-allowed"
+            variants={itemVariants}
+            whileHover={{ scale: !isPending && !isConfirming ? 1.02 : 1 }}
+            whileTap={{ scale: !isPending && !isConfirming ? 0.95 : 1 }}
           >
             {isPending && 'Waiting for approval...'}
             {isConfirming && 'Confirming transaction...'}
             {!isPending && !isConfirming && 'Lock It In & Start Earning'}
-          </button>
+          </motion.button>
 
           {/* GitHub connection reminder */}
           {!isGitHubConnected && !manualEntry && (
-            <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4">
-              <p className="text-sm text-blue-400">
+            <motion.div className="bg-orange-500/10 border border-orange-500/50 rounded-lg p-4" variants={itemVariants}>
+              <p className="text-sm text-orange-400">
                 💡 <strong>Tip:</strong> Connect your GitHub account above for automatic username verification!
               </p>
-            </div>
+            </motion.div>
           )}
-        </form>
+        </motion.form>
 
         {/* Transaction Status */}
         {hash && (
-          <div className="mt-6 p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
-            <p className="text-sm text-blue-400 mb-2">
-              Transaction submitted!
+          <div className="mt-6 p-4 bg-slate-800 border border-slate-700 rounded-lg">
+            <p className="text-sm text-slate-300 mb-3">
+              Transaction submitted
             </p>
             <a
               href={`https://sepolia.etherscan.io/tx/${hash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300 text-sm underline break-all"
+              className="text-orange-400 hover:text-orange-300 text-sm underline break-all"
             >
               View on Etherscan →
             </a>
@@ -202,11 +246,11 @@ export default function CreateCommitment() {
 
         {/* Success Message */}
         {isConfirmed && (
-          <div className="mt-6 p-4 bg-green-900/20 border border-green-700 rounded-lg text-center">
-            <p className="text-green-400 font-semibold mb-2">
+          <div className="mt-6 p-4 bg-emerald-500/10 border border-emerald-500 rounded-lg text-center">
+            <p className="text-emerald-400 font-semibold mb-2">
               ✅ Commitment Created Successfully!
             </p>
-            <p className="text-gray-400 text-sm">
+            <p className="text-slate-300 text-sm">
               Redirecting to dashboard...
             </p>
           </div>
@@ -214,13 +258,14 @@ export default function CreateCommitment() {
 
         {/* Error Message */}
         {error && (
-          <div className="mt-6 p-4 bg-red-900/20 border border-red-700 rounded-lg">
+          <div className="mt-6 p-4 bg-red-500/10 border border-red-500/50 rounded-lg">
             <p className="text-red-400 text-sm">
               ❌ Error: {error.message || 'Transaction failed'}
             </p>
           </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+        </div>
+    </motion.div>
   );
 }

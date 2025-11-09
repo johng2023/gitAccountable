@@ -22,10 +22,10 @@ export default function App() {
   const { isConnected } = useAccount();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+    <div className="min-h-screen bg-slate-900 text-white">
       <Navigation />
 
-      <main className="container mx-auto px-4 py-8">
+      <main>
         <Routes>
           {/* Landing Page - Public */}
           <Route path="/" element={<LandingPage />} />

@@ -1,127 +1,159 @@
 import { Link } from 'react-router-dom';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
+import { motion } from 'framer-motion';
 
 export default function LandingPage() {
   const { isConnected } = useAccount();
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: 'easeOut' },
+    },
+  };
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="bg-slate-900 min-h-screen">
       {/* Hero Section */}
-      <div className="text-center py-16">
-        <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-          CommitLock
-        </h1>
-        <p className="text-2xl md:text-3xl text-gray-300 mb-4">
-          Commit or Forfeit
-        </p>
-        <p className="text-lg text-gray-400 mb-8">
-          Put your money where your code is. Stake ETH, earn eETH rewards, commit daily or lose it all.
-        </p>
+      <motion.div
+        className="max-w-5xl mx-auto px-6 py-24 text-center"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.h1
+          className="text-5xl md:text-6xl font-bold mb-6 text-white tracking-tight"
+          variants={itemVariants}
+        >
+          GitAccountable
+        </motion.h1>
+        <motion.p
+          className="text-xl md:text-2xl text-slate-300 mb-4 font-light"
+          variants={itemVariants}
+        >
+          Stay accountable. Build consistently. Earn rewards.
+        </motion.p>
+        <motion.p
+          className="text-base text-slate-400 mb-12 max-w-2xl mx-auto"
+          variants={itemVariants}
+        >
+          Stake ETH, commit daily for 7 days, and earn staking rewards. Miss one day, lose it all.
+        </motion.p>
 
         {/* CTA */}
-        <div className="flex justify-center">
+        <motion.div className="flex justify-center" variants={itemVariants}>
           {isConnected ? (
-            <Link
-              to="/create"
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105"
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              Create Commitment
-            </Link>
+              <Link
+                to="/create"
+                className="relative bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg text-base transition-all shadow-lg shadow-orange-500/50 hover:shadow-orange-500/70 overflow-hidden group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 opacity-0 group-hover:opacity-30 blur-lg transition-opacity -z-10" />
+                Create Commitment
+              </Link>
+            </motion.div>
           ) : (
             <ConnectButton.Custom>
               {({ openConnectModal }) => (
-                <button
+                <motion.button
                   onClick={openConnectModal}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105"
+                  className="relative bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg text-base transition-all shadow-lg shadow-orange-500/50 hover:shadow-orange-500/70 overflow-hidden group"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  Connect Wallet to Start
-                </button>
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 opacity-0 group-hover:opacity-30 blur-lg transition-opacity -z-10" />
+                  Connect Wallet
+                </motion.button>
               )}
             </ConnectButton.Custom>
           )}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Explanation Section */}
-      <div className="grid md:grid-cols-3 gap-6 py-12">
-        <div className="bg-gray-800/50 p-6 rounded-lg border border-gray-700">
-          <div className="text-3xl mb-4">💰</div>
-          <h3 className="text-xl font-semibold mb-2">Stake & Earn</h3>
-          <p className="text-gray-400">
-            Stake 0.01 ETH through Ether.Fi and automatically earn eETH staking rewards while you build.
-          </p>
-        </div>
-
-        <div className="bg-gray-800/50 p-6 rounded-lg border border-gray-700">
-          <div className="text-3xl mb-4">📅</div>
-          <h3 className="text-xl font-semibold mb-2">Commit Daily</h3>
-          <p className="text-gray-400">
-            Make at least one GitHub commit every day for 7 days straight. No excuses.
-          </p>
-        </div>
-
-        <div className="bg-gray-800/50 p-6 rounded-lg border border-gray-700">
-          <div className="text-3xl mb-4">🎯</div>
-          <h3 className="text-xl font-semibold mb-2">Claim or Forfeit</h3>
-          <p className="text-gray-400">
-            Complete all days → claim your eETH with rewards. Miss one → forfeit everything.
-          </p>
-        </div>
-      </div>
+      <motion.div
+        className="max-w-5xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {[
+          { title: 'Stake & Earn', desc: 'Deposit 0.01 ETH and earn eETH staking rewards for 7 days.' },
+          { title: 'Commit Daily', desc: 'Make at least one GitHub commit every day for 7 days straight.' },
+          { title: 'Claim Rewards', desc: 'Complete all days to claim your eETH. Miss one, lose everything.' },
+        ].map((item, idx) => (
+          <motion.div
+            key={idx}
+            className="border border-slate-700/50 bg-slate-800/10 backdrop-blur-md rounded-lg p-6 hover:border-orange-500/30 transition-all duration-300 shadow-lg shadow-orange-500/5 hover:shadow-orange-500/20"
+            variants={itemVariants}
+            whileHover={{ y: -4, boxShadow: '0 0 30px rgba(249, 115, 22, 0.2)' }}
+          >
+            <div className="text-4xl font-bold text-orange-500 mb-3">0{idx + 1}</div>
+            <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
+            <p className="text-slate-400 text-sm">{item.desc}</p>
+          </motion.div>
+        ))}
+      </motion.div>
 
       {/* How It Works */}
-      <div className="py-12">
-        <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
-        <div className="space-y-6">
-          <div className="flex items-start space-x-4">
-            <div className="flex-shrink-0 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center font-bold">
-              1
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-1">Connect & Stake</h4>
-              <p className="text-gray-400">
-                Connect your wallet and stake 0.01 ETH with your GitHub username. Your ETH is instantly staked through Ether.Fi to receive eETH.
-              </p>
-            </div>
-          </div>
+      <motion.div
+        className="max-w-5xl mx-auto px-6 py-20"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.h2
+          className="text-3xl font-bold text-center mb-12 text-white"
+          variants={itemVariants}
+        >
+          How It Works
+        </motion.h2>
+        <motion.div className="space-y-8">
+          {[
+            { num: 1, title: 'Connect & Stake', desc: 'Link your wallet and GitHub, then stake 0.01 ETH. Your ETH is instantly converted to eETH through Ether.Fi.' },
+            { num: 2, title: 'Build for 7 Days', desc: 'Make at least one commit every day. Your eETH earns staking rewards automatically during this period.' },
+            { num: 3, title: 'Claim or Lose', desc: 'Complete all 7 days to claim your eETH with rewards. Miss even one day and forfeit your stake.' },
+          ].map((step, idx) => (
+            <motion.div
+              key={idx}
+              className="flex items-start gap-6"
+              variants={itemVariants}
+            >
+              <div className="flex-shrink-0 relative">
+                <div className="absolute inset-0 bg-orange-500/30 rounded-lg blur-lg animate-pulse" />
+                <div className="relative flex h-12 w-12 items-center justify-center rounded-lg border-2 border-orange-500 bg-slate-800 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-shadow">
+                  <span className="font-bold text-orange-500">{step.num}</span>
+                </div>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-lg font-semibold text-white mb-2">{step.title}</h4>
+                <p className="text-slate-400">{step.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.div>
 
-          <div className="flex items-start space-x-4">
-            <div className="flex-shrink-0 w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center font-bold">
-              2
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-1">Earn While You Code</h4>
-              <p className="text-gray-400">
-                During your 7-day commitment, your eETH earns staking rewards automatically. The oracle checks your GitHub commits daily.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start space-x-4">
-            <div className="flex-shrink-0 w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center font-bold">
-              3
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-1">Claim Your Rewards</h4>
-              <p className="text-gray-400">
-                After 7 successful days, claim your eETH with accrued staking rewards. If you miss even one day, the contract owner gets your forfeited eETH.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Powered By */}
-      <div className="py-12 text-center border-t border-gray-700">
-        <p className="text-gray-500 text-sm mb-4">Powered by</p>
-        <div className="flex justify-center items-center space-x-8 text-gray-400">
-          <span>Ether.Fi</span>
-          <span>•</span>
-          <span>Chainlink</span>
-          <span>•</span>
-          <span>Ethereum</span>
-        </div>
+      {/* Footer */}
+      <div className="border-t border-slate-700 py-8 text-center">
+        <p className="text-slate-500 text-sm">Built for developers who want accountability</p>
       </div>
     </div>
   );
