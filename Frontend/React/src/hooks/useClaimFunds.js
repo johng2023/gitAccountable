@@ -29,6 +29,7 @@ export function useClaimFunds() {
       address: COMMIT_LOCK_ADDRESS,
       abi: COMMIT_LOCK_ABI,
       functionName: 'claimFunds',
+      gas: 150000n, // Manual gas limit: actual max is ~60k, using 150k for safety
     });
   };
 

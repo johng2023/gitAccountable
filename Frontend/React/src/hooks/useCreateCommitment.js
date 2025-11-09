@@ -33,6 +33,7 @@ export function useCreateCommitment() {
       functionName: 'createCommitment',
       args: [githubUsername],
       value: parseEther(STAKE_AMOUNT),
+      gas: 300000n, // Manual gas limit: actual max is ~169k, using 300k for safety
     });
   };
 
