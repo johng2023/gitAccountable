@@ -26,28 +26,30 @@ export const api = {
   },
 
   // Create new commitment
-  createCommitment: async (walletAddress, githubUsername, stakeAmount) => {
+  createCommitment: async (walletAddress, githubUsername, stakeAmount, stakingPeriod = 7) => {
     const id = `commitment_${Date.now()}`;
+    const days = parseInt(stakingPeriod) || 7;
     const commitment = {
       id,
       walletAddress,
       githubUsername,
       stakeAmount,
+      stakingPeriod: days,
       status: 'active',
       daysComplete: 0,
-      daysArray: Array.from({ length: 7 }, (_, i) => ({
+      daysArray: Array.from({ length: days }, (_, i) => ({
         day: i + 1,
         status: 'pending',
       })),
       rewards: '0',
       createdAt: Date.now(),
     };
-    
+
     // Save to storage
     storage.commitments[id] = commitment;
     storage.users[walletAddress] = { walletAddress, githubUsername, commitmentId: id };
     localStorage.setItem(`commitment_${walletAddress}`, JSON.stringify(commitment));
-    
+
     return commitment;
   },
 

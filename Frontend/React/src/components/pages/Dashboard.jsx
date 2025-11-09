@@ -23,17 +23,25 @@ export default function Dashboard() {
 
     // Only fetch if we don't already have a commitment
     if (!commitment) {
+      let isMounted = true;
       getCommitment(address).then((data) => {
-        if (data) {
-          setCommitment(data);
-        } else {
-          // No commitment found, redirect to create form
-          navigate('/create');
+        if (isMounted) {
+          if (data) {
+            setCommitment(data);
+          } else {
+            // No commitment found, show fallback page (don't redirect)
+            // User can see the "No Commitments" page and create from there
+          }
         }
       }).catch(() => {
-        // Error fetching commitment, redirect to create form
-        navigate('/create');
+        // Error fetching commitment - show fallback page silently
+        if (isMounted) {
+          // Don't redirect on error, show the no commitments fallback
+        }
       });
+      return () => {
+        isMounted = false;
+      };
     }
   }, [address, commitment, getCommitment, setCommitment, navigate]);
 
@@ -126,19 +134,33 @@ export default function Dashboard() {
         {/* Daily Progress */}
         <Card className="mb-8">
           <h3>Daily Progress</h3>
-          <div className="grid-7">
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fill, minmax(35px, 1fr))`, gap: '4px' }}>
             {commitment.daysArray.map((day) => (
               <div
                 key={day.day}
-                className={
-                  day.status === 'complete'
-                    ? 'day-box day-complete'
-                    : day.status === 'pending'
-                    ? 'day-box day-pending'
-                    : 'day-box day-missed'
-                }
+                style={{
+                  width: '35px',
+                  height: '35px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  backgroundColor:
+                    day.status === 'complete'
+                      ? '#10b981'
+                      : day.status === 'pending'
+                      ? '#cbd5e1'
+                      : '#ef4444',
+                  color: day.status === 'pending' ? '#64748b' : '#ffffff',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  transition: 'all 0.2s ease',
+                }}
+                title={`Day ${day.day}: ${day.status}`}
               >
-                Day {day.day}
+                {day.day}
               </div>
             ))}
           </div>

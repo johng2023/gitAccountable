@@ -21,11 +21,11 @@ export function useCommitment() {
     }
   };
 
-  const createCommitment = async (walletAddress, githubUsername, stakeAmount) => {
+  const createCommitment = async (walletAddress, githubUsername, stakeAmount, stakingPeriod = 7) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await api.createCommitment(walletAddress, githubUsername, stakeAmount);
+      const data = await api.createCommitment(walletAddress, githubUsername, stakeAmount, stakingPeriod);
       setCommitment(data);
       return data;
     } catch (err) {
