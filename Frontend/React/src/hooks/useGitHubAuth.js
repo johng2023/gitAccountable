@@ -62,6 +62,12 @@ export function useGitHubAuth() {
     // Store state for CSRF protection
     sessionStorage.setItem('github_oauth_state', authUrl.searchParams.get('state'));
 
+    // DEBUG: Log OAuth parameters
+    console.log('🔍 GitHub OAuth Debug:');
+    console.log('  Client ID:', clientId);
+    console.log('  Redirect URI:', redirectUri);
+    console.log('  Full Auth URL:', authUrl.toString());
+
     // Redirect to GitHub (works better than popup for OAuth)
     window.location.href = authUrl.toString();
   }, [clientId, redirectUri, address]);
