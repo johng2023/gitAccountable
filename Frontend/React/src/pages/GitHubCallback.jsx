@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { setGitHubForWallet } from '../utils/walletGitHubStorage';
 
 /**
@@ -113,138 +114,239 @@ export default function GitHubCallback() {
     }
   };
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: 'easeOut' },
+    },
+  };
+
   return (
-    <div className="max-w-2xl mx-auto py-16">
-      <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-8">
-        {/* Username Confirmation State */}
-        {status === 'confirm' && authorizationVerified && (
-          <div>
-            <div className="text-center mb-6">
-              <svg className="w-16 h-16 text-blue-500 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-              </svg>
-              <h2 className="text-2xl font-bold mb-2 text-green-400">
-                ✓ GitHub Authorization Successful!
-              </h2>
-              <p className="text-gray-400 mb-6">
-                Please confirm your GitHub username to complete the connection
-              </p>
-            </div>
-
-            <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4 mb-6">
-              <p className="text-sm text-blue-400">
-                💡 We need your username to verify and link it to your wallet
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="username" className="block text-sm font-medium mb-2">
-                  GitHub Username
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  value={githubUsername}
-                  onChange={(e) => setGithubUsername(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleVerifyUsername()}
-                  placeholder="octocat"
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-                  autoFocus
-                />
-                <p className="text-gray-500 text-sm mt-2">
-                  Enter the username you just authorized
-                </p>
-              </div>
-
-              {error && (
-                <div className="bg-red-900/20 border border-red-700 rounded-lg p-4">
-                  <p className="text-sm text-red-400">❌ {error}</p>
-                </div>
-              )}
-
-              <button
-                onClick={handleVerifyUsername}
-                disabled={!githubUsername.trim()}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
-              >
-                Verify & Connect
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Verifying State */}
-        {status === 'verifying' && (
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mb-4"></div>
-            <h2 className="text-2xl font-bold mb-2">Verifying Username...</h2>
-            <p className="text-gray-400">
-              Checking GitHub for user "{githubUsername}"
-            </p>
-          </div>
-        )}
-
-        {/* Success State */}
-        {status === 'success' && githubUser && (
-          <div className="text-center">
-            <div className="mb-6">
-              <svg className="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold mb-4 text-green-400">
-              ✓ GitHub Connected Successfully!
-            </h2>
-            <div className="flex items-center justify-center space-x-3 mb-4">
-              {githubUser.avatar_url && (
-                <img
-                  src={githubUser.avatar_url}
-                  alt={githubUser.login}
-                  className="w-12 h-12 rounded-full border-2 border-green-500"
-                />
-              )}
-              <div className="text-left">
-                <p className="font-semibold text-white">{githubUser.login}</p>
-                <p className="text-sm text-gray-400">GitHub User ID: {githubUser.id}</p>
-              </div>
-            </div>
-            <p className="text-gray-400 mb-6">
-              Your wallet is now linked to your GitHub account.
-            </p>
-            <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4">
-              <p className="text-sm text-blue-400">
-                Redirecting to create commitment...
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Error State */}
-        {status === 'error' && (
-          <div className="text-center">
-            <div className="mb-6">
-              <svg className="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold mb-4 text-red-400">
-              Authorization Failed
-            </h2>
-            <div className="bg-red-900/20 border border-red-700 rounded-lg p-4 mb-6">
-              <p className="text-sm text-red-400">
-                ❌ {error || 'An unknown error occurred'}
-              </p>
-            </div>
-            <button
-              onClick={() => navigate('/create')}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+    <motion.div
+      className="min-h-screen bg-slate-900"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="max-w-2xl mx-auto px-6 py-16">
+        <motion.div
+          className="border border-slate-700/50 bg-slate-800/10 backdrop-blur-md rounded-lg p-8 shadow-2xl shadow-orange-500/10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
+          {/* Username Confirmation State */}
+          {status === 'confirm' && authorizationVerified && (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
             >
-              Try Again
-            </button>
-          </div>
-        )}
+              <motion.div className="text-center mb-8" variants={itemVariants}>
+                <motion.svg
+                  className="w-16 h-16 text-orange-500 mx-auto mb-4"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ duration: 0.6, ease: 'backOut' }}
+                >
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </motion.svg>
+                <h2 className="text-3xl font-bold mb-2 text-white">
+                  GitHub Authorization Successful!
+                </h2>
+                <p className="text-slate-300 mb-6">
+                  Please confirm your GitHub username to complete the connection
+                </p>
+              </motion.div>
+
+              <motion.div
+                className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4 mb-8"
+                variants={itemVariants}
+              >
+                <p className="text-sm text-orange-300">
+                  💡 We need your username to verify and link it to your wallet
+                </p>
+              </motion.div>
+
+              <motion.div className="space-y-4" variants={containerVariants}>
+                <motion.div variants={itemVariants}>
+                  <label htmlFor="username" className="block text-sm font-medium mb-2 text-slate-200">
+                    GitHub Username
+                  </label>
+                  <input
+                    type="text"
+                    id="username"
+                    value={githubUsername}
+                    onChange={(e) => setGithubUsername(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleVerifyUsername()}
+                    placeholder="octocat"
+                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 text-white rounded-lg focus:outline-none focus:border-orange-500 transition-colors duration-200 placeholder-slate-600"
+                    autoFocus
+                  />
+                  <p className="text-slate-500 text-sm mt-2">
+                    Enter the username you just authorized
+                  </p>
+                </motion.div>
+
+                {error && (
+                  <motion.div
+                    className="bg-red-500/10 border border-red-500/30 rounded-lg p-4"
+                    variants={itemVariants}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                  >
+                    <p className="text-sm text-red-300">❌ {error}</p>
+                  </motion.div>
+                )}
+
+                <motion.button
+                  onClick={handleVerifyUsername}
+                  disabled={!githubUsername.trim()}
+                  className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold py-4 px-8 rounded-lg transition-all disabled:cursor-not-allowed overflow-hidden group"
+                  variants={itemVariants}
+                  whileHover={{ scale: !githubUsername.trim() ? 1 : 1.02 }}
+                  whileTap={{ scale: !githubUsername.trim() ? 1 : 0.98 }}
+                >
+                  {githubUsername.trim() ? '✓ Verify & Connect' : 'Enter username'}
+                </motion.button>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* Verifying State */}
+          {status === 'verifying' && (
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div
+                className="inline-block rounded-full h-16 w-16 mb-6 border-4 border-slate-700 border-t-orange-500"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              />
+              <h2 className="text-3xl font-bold mb-3 text-white">Verifying Username...</h2>
+              <p className="text-slate-400">
+                Checking GitHub for user "{githubUsername}"
+              </p>
+            </motion.div>
+          )}
+
+          {/* Success State */}
+          {status === 'success' && githubUser && (
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            >
+              <motion.div
+                className="mb-6"
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: 'backOut' }}
+              >
+                <svg className="w-16 h-16 text-emerald-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </motion.div>
+              <motion.h2 className="text-3xl font-bold mb-6 text-white" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+                GitHub Connected Successfully!
+              </motion.h2>
+              <motion.div
+                className="flex items-center justify-center space-x-4 mb-6 bg-slate-800/30 border border-slate-700 rounded-lg p-6"
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                {githubUser.avatar_url && (
+                  <img
+                    src={githubUser.avatar_url}
+                    alt={githubUser.login}
+                    className="w-14 h-14 rounded-full border-2 border-orange-500"
+                  />
+                )}
+                <div className="text-left">
+                  <p className="font-semibold text-white text-lg">{githubUser.login}</p>
+                  <p className="text-sm text-slate-400">GitHub User ID: {githubUser.id}</p>
+                </div>
+              </motion.div>
+              <motion.p className="text-slate-300 mb-6" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
+                Your wallet is now linked to your GitHub account.
+              </motion.p>
+              <motion.div
+                className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4"
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                <p className="text-sm text-orange-300">
+                  ⏳ Redirecting to create commitment...
+                </p>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* Error State */}
+          {status === 'error' && (
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <motion.div
+                className="mb-6"
+                initial={{ scale: 0, rotate: 180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ duration: 0.6, ease: 'backOut' }}
+              >
+                <svg className="w-16 h-16 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </motion.div>
+              <motion.h2 className="text-3xl font-bold mb-6 text-white" initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+                Authorization Failed
+              </motion.h2>
+              <motion.div
+                className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-8"
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                <p className="text-sm text-red-300">
+                  ❌ {error || 'An unknown error occurred'}
+                </p>
+              </motion.div>
+              <motion.button
+                onClick={() => navigate('/create')}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg transition-all overflow-hidden"
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Try Again
+              </motion.button>
+            </motion.div>
+          )}
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
