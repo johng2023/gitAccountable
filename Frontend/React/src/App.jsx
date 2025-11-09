@@ -5,7 +5,6 @@ import { useAccount } from 'wagmi';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import CreateCommitment from './pages/CreateCommitment';
-import GitHubCallback from './pages/GitHubCallback';
 
 // Components
 import Navigation from './components/Navigation';
@@ -45,9 +44,6 @@ export default function App() {
               isConnected ? <CreateCommitment /> : <Navigate to="/" replace />
             }
           />
-
-          {/* GitHub OAuth Callback - Public (handles OAuth redirect) */}
-          <Route path="/auth/github/callback" element={<GitHubCallback />} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
