@@ -70,15 +70,38 @@ export const api = {
     return null;
   },
 
-  // Validate GitHub username
+  // Validate GitHub username by checking if user exists on GitHub
   validateGitHub: async (username) => {
-    // Simple validation - check format
-    if (username && /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i.test(username)) {
-      return {
-        valid: true,
-        user: { username },
-      };
+    try {
+      // Check if username format is valid first
+      if (!username || !/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i.test(username)) {
+        return { valid: false, user: null };
+      }
+
+      // Call GitHub API to verify the user actually exists
+      const response = await fetch(`https://api.github.com/users/${username}`, {
+        headers: {
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'GitAccountable'
+        }
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        return {
+          valid: true,
+          user: {
+            username: userData.login,
+            id: userData.id,
+            avatarUrl: userData.avatar_url,
+            profileUrl: userData.html_url
+          }
+        };
+      }
+      return { valid: false, user: null };
+    } catch (err) {
+      console.error('GitHub API validation error:', err);
+      return { valid: false, user: null };
     }
-    return { valid: false, user: null };
   },
 };

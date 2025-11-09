@@ -16,6 +16,31 @@ export function AppProvider({ children }) {
     successMessage: null,
   });
 
+  const logout = () => {
+    // Clear app state
+    setUser({
+      githubUsername: null,
+      walletAddress: null,
+    });
+    setCommitment(null);
+    setUiState({
+      isLoading: false,
+      error: null,
+      successMessage: null,
+    });
+
+    // Clear localStorage
+    localStorage.removeItem('github_token');
+    localStorage.removeItem('github_user');
+
+    // Clear all stored commitments
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('commitment_')) {
+        localStorage.removeItem(key);
+      }
+    });
+  };
+
   const value = {
     user,
     setUser,
@@ -23,6 +48,7 @@ export function AppProvider({ children }) {
     setCommitment,
     uiState,
     setUiState,
+    logout,
   };
 
   return (

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../common/Button';
 import Card from '../common/Card';
@@ -10,8 +10,42 @@ import { formatAddress } from '../../utils/format';
 export default function Dashboard() {
   const navigate = useNavigate();
   const { address } = useWallet();
-  const { commitment, setCommitment } = useApp();
+  const { commitment, setCommitment, logout } = useApp();
   const { getCommitment, claimRewards, isLoading } = useCommitment();
+  const [timeRemaining, setTimeRemaining] = useState('');
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (!commitment) return;
+
+    const calculateTimeRemaining = () => {
+      if (!commitment.createdAt) return '';
+
+      const createdAt = new Date(commitment.createdAt);
+      const stakingDays = commitment.stakingPeriod || 7;
+      const unlockTime = new Date(createdAt.getTime() + stakingDays * 24 * 60 * 60 * 1000);
+      const now = new Date();
+
+      if (now >= unlockTime) {
+        return 'Unlocked - You can claim your ETH';
+      }
+
+      const diff = unlockTime - now;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / 1000 / 60) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    };
+
+    setTimeRemaining(calculateTimeRemaining());
+    const timer = setInterval(() => {
+      setTimeRemaining(calculateTimeRemaining());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [commitment]);
 
   // Fetch commitment when address is available
   useEffect(() => {
@@ -97,8 +131,26 @@ export default function Dashboard() {
   return (
     <div className="page-container">
       <div className="content-width">
-        <div className="page-nav">
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+          paddingBottom: '16px',
+          borderBottom: '1px solid #334155'
+        }}>
           <button onClick={() => navigate('/')} className="link-button">← Back to Home</button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              logout();
+              navigate('/');
+            }}
+            style={{ padding: '8px 12px', fontSize: '12px' }}
+          >
+            Logout
+          </Button>
         </div>
         <h1>Dashboard</h1>
 
@@ -126,7 +178,13 @@ export default function Dashboard() {
             </div>
             <div>
               <p className="label">Progress</p>
-              <p className="value">{commitment.daysComplete}/7 days complete</p>
+              <p className="value">{commitment.daysComplete}/{commitment.stakingPeriod || 7} days complete</p>
+            </div>
+            <div>
+              <p className="label">Time Until Unlock</p>
+              <p className="value" style={{ color: '#10b981', fontSize: '14px', fontWeight: '600' }}>
+                {timeRemaining}
+              </p>
             </div>
           </div>
         </Card>

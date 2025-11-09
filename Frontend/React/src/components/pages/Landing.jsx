@@ -11,7 +11,7 @@ export default function Landing() {
   const navigate = useNavigate();
   const { isConnected, address } = useWallet();
   const { getCommitment } = useCommitment();
-  const { commitment, setCommitment, user } = useApp();
+  const { commitment, setCommitment, user, logout } = useApp();
 
   // Check for existing commitment when wallet is connected
   // Only check once when wallet connects, not on every render
@@ -37,6 +37,33 @@ export default function Landing() {
 
   return (
     <div className="hero-section">
+      {/* Header with Logout */}
+      {user?.githubUsername && (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '16px 0',
+          marginBottom: '20px',
+          borderBottom: '1px solid #334155'
+        }}>
+          <div style={{ color: '#cbd5e1', fontSize: '14px' }}>
+            Logged in as <strong>{user.githubUsername}</strong>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              logout();
+              navigate('/');
+            }}
+            style={{ padding: '8px 12px', fontSize: '12px' }}
+          >
+            Logout
+          </Button>
+        </div>
+      )}
+
       {/* Hero Section */}
       <div className="hero">
         <h1>Commit or Forfeit</h1>
