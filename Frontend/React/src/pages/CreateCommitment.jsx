@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { motion } from 'framer-motion';
@@ -9,8 +8,6 @@ import { STAKE_AMOUNT, DURATION_DAYS } from '../config/contracts';
 import ConnectGitHub from '../components/ConnectGitHub';
 
 export default function CreateCommitment() {
-  const [githubUsername, setGithubUsername] = useState('');
-  const [manualEntry, setManualEntry] = useState(false);
   const navigate = useNavigate();
   const { address } = useAccount();
 
@@ -25,10 +22,8 @@ export default function CreateCommitment() {
     error,
   } = useCreateCommitment();
 
-  // Auto-fill username from GitHub connection
-  const effectiveUsername = isGitHubConnected && githubData && !manualEntry
-    ? githubData.username
-    : githubUsername;
+  // Get username from GitHub connection
+  const effectiveUsername = isGitHubConnected && githubData ? githubData.username : '';
 
   // Redirect to dashboard after confirmation
   if (isConfirmed) {
@@ -38,7 +33,7 @@ export default function CreateCommitment() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!effectiveUsername.trim()) {
-      alert('Please connect GitHub or enter your GitHub username');
+      alert('Please connect your GitHub account to continue');
       return;
     }
     createCommitment(effectiveUsername.trim());
@@ -119,59 +114,7 @@ export default function CreateCommitment() {
             <label className="block text-sm font-medium text-slate-300 mb-3">
               GitHub Account
             </label>
-
-            {/* Show GitHub connection component */}
-            {!manualEntry && (
-              <div className="mb-4">
-                <ConnectGitHub showDetails={true} />
-              </div>
-            )}
-
-            {/* If GitHub connected, show username (read-only) */}
-            {isGitHubConnected && githubData && !manualEntry ? (
-              <div className="bg-emerald-500/10 border border-emerald-500 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-400 mb-1">Tracking commits from:</p>
-                    <p className="text-xl font-bold text-white">{githubData.username}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setManualEntry(true)}
-                    className="text-sm text-orange-400 hover:text-orange-300"
-                  >
-                    Enter manually
-                  </button>
-                </div>
-              </div>
-            ) : (
-              /* Manual username entry (fallback) */
-              <div>
-                <input
-                  type="text"
-                  id="github"
-                  value={githubUsername}
-                  onChange={(e) => setGithubUsername(e.target.value)}
-                  placeholder="octocat"
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-orange-500 text-white placeholder-slate-500"
-                  disabled={isPending || isConfirming}
-                />
-                <div className="flex items-center justify-between mt-2">
-                  <p className="text-slate-500 text-sm">
-                    We'll track commits from this GitHub account
-                  </p>
-                  {isGitHubConnected && manualEntry && (
-                    <button
-                      type="button"
-                      onClick={() => setManualEntry(false)}
-                      className="text-sm text-orange-400 hover:text-orange-300"
-                    >
-                      Use connected account
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
+            <ConnectGitHub showDetails={true} />
           </motion.div>
 
           {/* Commitment Details */}
@@ -218,10 +161,10 @@ export default function CreateCommitment() {
           </motion.button>
 
           {/* GitHub connection reminder */}
-          {!isGitHubConnected && !manualEntry && (
+          {!isGitHubConnected && (
             <motion.div className="bg-orange-500/10 border border-orange-500/50 rounded-lg p-4" variants={itemVariants}>
               <p className="text-sm text-orange-400">
-                💡 <strong>Tip:</strong> Connect your GitHub account above for automatic username verification!
+                💡 <strong>Tip:</strong> Connect your GitHub account above to enable commitment tracking!
               </p>
             </motion.div>
           )}
