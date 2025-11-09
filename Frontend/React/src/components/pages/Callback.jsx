@@ -6,7 +6,7 @@ import Button from '../common/Button';
 export default function Callback() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { setUser } = useApp();
+  const { setUser, setJwtToken } = useApp();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -39,8 +39,8 @@ export default function Callback() {
         const data = await response.json();
 
         if (data.success) {
-          // Store token in localStorage
-          localStorage.setItem('github_token', data.token);
+          // Store JWT token in localStorage
+          localStorage.setItem('jwt_token', data.token);
           localStorage.setItem('github_user', JSON.stringify(data.user));
 
           // Update app context
@@ -48,6 +48,7 @@ export default function Callback() {
             githubUsername: data.user.username,
             walletAddress: null // Will be set when wallet connects
           });
+          setJwtToken(data.token);
 
           // Redirect to create commitment or dashboard
           navigate('/create', { replace: true });

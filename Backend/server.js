@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const { initializeDatabase } = require('./db');
 const authRoutes = require('./routes/auth');
+const commitmentRoutes = require('./routes/commitments');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,6 +20,7 @@ app.use(cors({
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/commitments', commitmentRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -62,6 +64,8 @@ async function start() {
       console.log(`🔐 GitHub OAuth: POST /api/auth/github`);
       console.log(`👤 User Profile: GET /api/auth/profile`);
       console.log(`💼 Update Wallet: POST /api/auth/wallet`);
+      console.log(`📌 Create Commitment: POST /api/commitments/create`);
+      console.log(`📊 Get Commitment: GET /api/commitments/get/:githubUsername/:walletAddress`);
       console.log('\n✨ Ready to accept connections!\n');
     });
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const fetch = require('node-fetch');
+const { query } = require('../db');
 
 const router = express.Router();
 

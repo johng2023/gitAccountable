@@ -1,72 +1,70 @@
-// Simple mock API - Replace with real backend when ready
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
-// In-memory storage for demo
-const storage = {
-  commitments: {},
-  users: {},
+// Helper to get JWT token from localStorage
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('jwt_token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
 };
 
 export const api = {
-  // Get user commitment
-  getCommitment: async (walletAddress) => {
-    // Check localStorage first
-    const stored = localStorage.getItem(`commitment_${walletAddress}`);
-    if (stored) {
-      return JSON.parse(stored);
+  // Get user commitment from backend
+  getCommitment: async (githubUsername, walletAddress) => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/commitments/get/${githubUsername}/${walletAddress}`,
+        {
+          method: 'GET',
+          headers: getAuthHeaders()
+        }
+      );
+
+      if (!response.ok) {
+        console.error('Get commitment error:', response.status);
+        return null;
+      }
+
+      const data = await response.json();
+      return data.success ? data.commitment : null;
+    } catch (error) {
+      console.error('Get commitment fetch error:', error);
+      return null;
     }
-    
-    // Check in-memory storage
-    const user = storage.users[walletAddress];
-    if (user?.commitmentId) {
-      return storage.commitments[user.commitmentId];
-    }
-    
-    return null;
   },
 
-  // Create new commitment
+  // Create new commitment on backend
   createCommitment: async (walletAddress, githubUsername, stakeAmount, stakingPeriod = 7) => {
-    const id = `commitment_${Date.now()}`;
-    const days = parseInt(stakingPeriod) || 7;
-    const commitment = {
-      id,
-      walletAddress,
-      githubUsername,
-      stakeAmount,
-      stakingPeriod: days,
-      status: 'active',
-      daysComplete: 0,
-      daysArray: Array.from({ length: days }, (_, i) => ({
-        day: i + 1,
-        status: 'pending',
-      })),
-      rewards: '0',
-      createdAt: Date.now(),
-    };
+    try {
+      const response = await fetch(`${API_BASE}/commitments/create`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          githubUsername,
+          walletAddress,
+          stakeAmount: stakeAmount.toString(),
+          stakingPeriod: parseInt(stakingPeriod)
+        })
+      });
 
-    // Save to storage
-    storage.commitments[id] = commitment;
-    storage.users[walletAddress] = { walletAddress, githubUsername, commitmentId: id };
-    localStorage.setItem(`commitment_${walletAddress}`, JSON.stringify(commitment));
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Create commitment error:', errorData);
+        return null;
+      }
 
-    return commitment;
+      const data = await response.json();
+      return data.success ? data.commitment : null;
+    } catch (error) {
+      console.error('Create commitment fetch error:', error);
+      return null;
+    }
   },
 
   // Claim rewards
   claimRewards: async (commitmentId) => {
-    const commitment = storage.commitments[commitmentId] || 
-      JSON.parse(localStorage.getItem(`commitment_${commitmentId}`) || '{}');
-    
-    if (commitment) {
-      commitment.status = 'completed';
-      localStorage.setItem(`commitment_${commitment.walletAddress}`, JSON.stringify(commitment));
-      return {
-        txHash: '0x' + Math.random().toString(16).slice(2),
-        rewards: commitment.rewards,
-        totalClaimed: (parseFloat(commitment.stakeAmount) + parseFloat(commitment.rewards || 0)).toString(),
-      };
-    }
+    // TODO: Implement backend endpoint for claiming rewards
     return null;
   },
 

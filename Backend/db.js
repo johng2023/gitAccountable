@@ -33,11 +33,33 @@ async function initializeDatabase() {
     await pool.query(createTableQuery);
     console.log('✅ Users table ready');
 
+    // Create commitments table if it doesn't exist
+    const createCommitmentsTableQuery = `
+      CREATE TABLE IF NOT EXISTS commitments (
+        id SERIAL PRIMARY KEY,
+        github_username VARCHAR(255) NOT NULL,
+        wallet_address VARCHAR(255) NOT NULL,
+        stake_amount DECIMAL(20, 18) NOT NULL,
+        staking_period INT NOT NULL,
+        status VARCHAR(50) DEFAULT 'active',
+        days_complete INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(github_username, wallet_address, status)
+      );
+    `;
+
+    await pool.query(createCommitmentsTableQuery);
+    console.log('✅ Commitments table ready');
+
     // Create indexes for faster queries
     const indexQueries = [
       'CREATE INDEX IF NOT EXISTS idx_github_id ON users(github_id);',
       'CREATE INDEX IF NOT EXISTS idx_github_username ON users(github_username);',
-      'CREATE INDEX IF NOT EXISTS idx_wallet_address ON users(wallet_address);'
+      'CREATE INDEX IF NOT EXISTS idx_wallet_address ON users(wallet_address);',
+      'CREATE INDEX IF NOT EXISTS idx_commitments_github ON commitments(github_username);',
+      'CREATE INDEX IF NOT EXISTS idx_commitments_wallet ON commitments(wallet_address);',
+      'CREATE INDEX IF NOT EXISTS idx_commitments_status ON commitments(status);'
     ];
 
     for (const query of indexQueries) {

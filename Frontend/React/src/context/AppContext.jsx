@@ -10,6 +10,11 @@ export function AppProvider({ children }) {
 
   const [commitment, setCommitment] = useState(null);
 
+  const [jwtToken, setJwtToken] = useState(() => {
+    // Initialize from localStorage if available
+    return localStorage.getItem('jwt_token') || null;
+  });
+
   const [uiState, setUiState] = useState({
     isLoading: false,
     error: null,
@@ -23,6 +28,7 @@ export function AppProvider({ children }) {
       walletAddress: null,
     });
     setCommitment(null);
+    setJwtToken(null);
     setUiState({
       isLoading: false,
       error: null,
@@ -30,6 +36,7 @@ export function AppProvider({ children }) {
     });
 
     // Clear localStorage
+    localStorage.removeItem('jwt_token');
     localStorage.removeItem('github_token');
     localStorage.removeItem('github_user');
 
@@ -46,6 +53,8 @@ export function AppProvider({ children }) {
     setUser,
     commitment,
     setCommitment,
+    jwtToken,
+    setJwtToken,
     uiState,
     setUiState,
     logout,

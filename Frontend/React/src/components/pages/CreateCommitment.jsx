@@ -7,6 +7,7 @@ import { useGitHub } from "../../hooks/useGitHub";
 import { useCommitment } from "../../hooks/useCommitment";
 import { useWallet } from "../../context/WalletContext";
 import { useApp } from "../../context/AppContext";
+import { useToast } from "../../context/ToastContext";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export default function CreateCommitment() {
@@ -15,6 +16,7 @@ export default function CreateCommitment() {
   const { setUser, setCommitment, commitment, user } = useApp();
   const { validateUsername, isLoading: gitHubLoading } = useGitHub();
   const { createCommitment, isLoading: commitLoading } = useCommitment();
+  const { addToast } = useToast();
 
   // Redirect to dashboard if commitment already exists
   useEffect(() => {
@@ -68,6 +70,12 @@ export default function CreateCommitment() {
   };
 
   const handleLockIn = async () => {
+    // Check if user already has an active commitment
+    if (commitment) {
+      addToast("You can only have one active commitment at a time", "warning");
+      return;
+    }
+
     if (!isValid) {
       setValidationError("Please validate GitHub username first");
       return;
@@ -87,7 +95,10 @@ export default function CreateCommitment() {
     if (result) {
       setUser({ githubUsername: username, walletAddress: address });
       setCommitment(result);
+      addToast("Commitment created successfully!", "success");
       navigate("/dashboard");
+    } else {
+      addToast("Failed to create commitment", "error");
     }
   };
 

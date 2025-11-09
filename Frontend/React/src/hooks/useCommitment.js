@@ -6,11 +6,11 @@ export function useCommitment() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const getCommitment = async (walletAddress) => {
+  const getCommitment = async (githubUsername, walletAddress) => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await api.getCommitment(walletAddress);
+      const data = await api.getCommitment(githubUsername, walletAddress);
       setCommitment(data);
       return data;
     } catch (err) {

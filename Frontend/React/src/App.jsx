@@ -7,8 +7,10 @@ import '@rainbow-me/rainbowkit/styles.css';
 import { wagmiConfig } from './services/wagmi';
 import { WalletProvider } from './context/WalletContext';
 import { AppProvider } from './context/AppContext';
+import { ToastProvider } from './context/ToastContext';
 
 import MainLayout from './components/layout/MainLayout';
+import ToastContainer from './components/common/ToastContainer';
 import Landing from './components/pages/Landing';
 import CreateCommitment from './components/pages/CreateCommitment';
 import Dashboard from './components/pages/Dashboard';
@@ -23,16 +25,19 @@ function App() {
         <RainbowKitProvider>
           <WalletProvider>
             <AppProvider>
-              <Router>
-                <Routes>
-                  <Route element={<MainLayout />}>
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/callback" element={<Callback />} />
-                    <Route path="/create" element={<CreateCommitment />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                  </Route>
-                </Routes>
-              </Router>
+              <ToastProvider>
+                <Router>
+                  <Routes>
+                    <Route element={<MainLayout />}>
+                      <Route path="/" element={<Landing />} />
+                      <Route path="/callback" element={<Callback />} />
+                      <Route path="/create" element={<CreateCommitment />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
+                    </Route>
+                  </Routes>
+                </Router>
+                <ToastContainer />
+              </ToastProvider>
             </AppProvider>
           </WalletProvider>
         </RainbowKitProvider>
