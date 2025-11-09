@@ -22,6 +22,18 @@ export default function Callback() {
           return;
         }
 
+        // Validate state parameter to prevent CSRF attacks
+        const storedState = sessionStorage.getItem('oauth_state');
+        if (!state || state !== storedState) {
+          setError('Invalid state parameter - possible CSRF attack');
+          sessionStorage.removeItem('oauth_state');
+          setLoading(false);
+          return;
+        }
+
+        // Clear stored state after validation
+        sessionStorage.removeItem('oauth_state');
+
         // Call backend to exchange code for token
         const response = await fetch(
           `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth/github`,

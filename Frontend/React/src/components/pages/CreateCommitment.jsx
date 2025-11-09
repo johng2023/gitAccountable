@@ -65,7 +65,13 @@ export default function CreateCommitment() {
   };
 
   const handleApprove = async () => {
+    if (!isValid) {
+      addToast("Please validate GitHub username first", "warning");
+      return;
+    }
+
     // Mock approval - in real app, this calls smart contract
+    addToast("eETH approval confirmed!", "success");
     setApprovalDone(true);
   };
 

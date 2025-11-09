@@ -77,10 +77,15 @@ export default function Landing() {
             <Button
               size="lg"
               onClick={() => {
+                // Generate a random state parameter for CSRF protection
+                const state = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                // Store state in sessionStorage for validation after redirect
+                sessionStorage.setItem('oauth_state', state);
+
                 // GitHub OAuth - redirect to GitHub auth endpoint
                 window.location.href = `https://github.com/login/oauth/authorize?client_id=${
                   import.meta.env.VITE_GITHUB_CLIENT_ID || "your_client_id"
-                }&redirect_uri=${window.location.origin}/callback&scope=user`;
+                }&redirect_uri=${window.location.origin}/callback&scope=user&state=${state}`;
               }}
             >
               Step 1: Login with GitHub
