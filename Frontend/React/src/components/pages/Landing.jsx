@@ -11,12 +11,12 @@ export default function Landing() {
   const navigate = useNavigate();
   const { isConnected, address } = useWallet();
   const { getCommitment } = useCommitment();
-  const { commitment, setCommitment } = useApp();
+  const { commitment, setCommitment, user } = useApp();
 
   // Check for existing commitment when wallet is connected
   // Only check once when wallet connects, not on every render
   useEffect(() => {
-    if (isConnected && address && !commitment) {
+    if (isConnected && address && !commitment && user?.githubUsername) {
       let isMounted = true;
       getCommitment(address)
         .then((data) => {
@@ -33,7 +33,7 @@ export default function Landing() {
         isMounted = false;
       };
     }
-  }, [isConnected, address]); // Remove commitment from dependencies to avoid loops
+  }, [isConnected, address, user?.githubUsername]); // Only redirect if both wallet AND GitHub are connected
 
   return (
     <div className="hero-section">
@@ -45,10 +45,9 @@ export default function Landing() {
           staking rewards. Miss even one day and forfeit your stake.
         </p>
 
-        {!isConnected ? (
+        {!user?.githubUsername ? (
           <div className="button-group">
             <Button
-              variant="secondary"
               size="lg"
               onClick={() => {
                 // GitHub OAuth - redirect to GitHub auth endpoint
@@ -57,16 +56,21 @@ export default function Landing() {
                 }&redirect_uri=${window.location.origin}/callback&scope=user`;
               }}
             >
-              Login with GitHub
+              Step 1: Login with GitHub
             </Button>
-
-            <ConnectButton
-              onClick={() => navigate("/create")}
-              label="Connect Wallet To Get Started"
-            ></ConnectButton>
+          </div>
+        ) : !isConnected ? (
+          <div className="button-group">
+            <p style={{ color: "#cbd5e1", marginBottom: "20px", fontSize: "16px" }}>
+              Welcome, <strong>{user.githubUsername}</strong>!
+            </p>
+            <ConnectButton label="Step 2: Connect Your Wallet" />
           </div>
         ) : (
           <div className="button-group">
+            <p style={{ color: "#cbd5e1", marginBottom: "20px", fontSize: "16px" }}>
+              Welcome, <strong>{user.githubUsername}</strong>!
+            </p>
             <Button size="lg" onClick={() => navigate("/dashboard")}>
               Go to Dashboard
             </Button>

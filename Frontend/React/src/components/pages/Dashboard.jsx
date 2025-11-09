@@ -52,11 +52,28 @@ export default function Dashboard() {
   }
 
   if (!commitment) {
-    // This should redirect to /create, but show a message just in case
     return (
       <div className="page-container">
-        <div className="content-width text-center">
-          <p>No active commitment found. Redirecting...</p>
+        <div className="content-width">
+          <div className="page-nav">
+            <button onClick={() => navigate('/')} className="link-button">← Back to Home</button>
+          </div>
+          <h1>Dashboard</h1>
+
+          <Card className="mb-8">
+            <div className="text-center">
+              <h2 className="mb-4">No Commitments Currently</h2>
+              <p className="mb-6" style={{ color: '#cbd5e1', fontSize: '16px' }}>
+                You haven't created any commitments yet. Start a new commitment to begin staking and earning rewards!
+              </p>
+              <Button
+                size="lg"
+                onClick={() => navigate('/create')}
+              >
+                Create New Commitment
+              </Button>
+            </div>
+          </Card>
         </div>
       </div>
     );

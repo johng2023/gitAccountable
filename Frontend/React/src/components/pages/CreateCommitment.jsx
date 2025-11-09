@@ -12,7 +12,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 export default function CreateCommitment() {
   const navigate = useNavigate();
   const { address, isConnected } = useWallet();
-  const { setUser, setCommitment, commitment } = useApp();
+  const { setUser, setCommitment, commitment, user } = useApp();
   const { validateUsername, isLoading: gitHubLoading } = useGitHub();
   const { createCommitment, isLoading: commitLoading } = useCommitment();
 
@@ -30,10 +30,21 @@ export default function CreateCommitment() {
     }
   }, [isConnected, navigate]);
 
+  // Auto-populate GitHub username from context
   const [username, setUsername] = useState("");
+  const [eethAmount, setEethAmount] = useState("0.01");
+  const [stakingPeriod, setStakingPeriod] = useState("7");
   const [validationError, setValidationError] = useState(null);
   const [isValid, setIsValid] = useState(false);
   const [approvalDone, setApprovalDone] = useState(false);
+
+  // Auto-populate username when component mounts
+  useEffect(() => {
+    if (user?.githubUsername) {
+      setUsername(user.githubUsername);
+      setIsValid(true);
+    }
+  }, [user?.githubUsername]);
 
   const handleUsernameChange = async (e) => {
     const value = e.target.value;
@@ -62,7 +73,17 @@ export default function CreateCommitment() {
       return;
     }
 
-    const result = await createCommitment(address, username, "0.01");
+    if (!eethAmount || parseFloat(eethAmount) <= 0) {
+      setValidationError("Please enter a valid eETH amount");
+      return;
+    }
+
+    if (!stakingPeriod || parseInt(stakingPeriod) <= 0) {
+      setValidationError("Please enter a valid staking period");
+      return;
+    }
+
+    const result = await createCommitment(address, username, eethAmount, stakingPeriod);
     if (result) {
       setUser({ githubUsername: username, walletAddress: address });
       setCommitment(result);
@@ -120,18 +141,32 @@ export default function CreateCommitment() {
         {/* Stake Details Card */}
         <Card className="mb-8">
           <h2>Stake Details</h2>
-          <div className="details-grid">
-            <div className="detail-row">
-              <span>Stake Amount:</span>
-              <span className="detail-value">0.01 eETH</span>
-            </div>
-            <div className="detail-row">
-              <span>Duration:</span>
-              <span className="detail-value">7 days</span>
-            </div>
+          <div className="form-group">
+            <label htmlFor="eethAmount">eETH Amount to Stake</label>
+            <Input
+              id="eethAmount"
+              type="number"
+              placeholder="0.01"
+              value={eethAmount}
+              onChange={(e) => setEethAmount(e.target.value)}
+              step="0.01"
+              min="0.01"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="stakingPeriod">Staking Period (days)</label>
+            <Input
+              id="stakingPeriod"
+              type="number"
+              placeholder="7"
+              value={stakingPeriod}
+              onChange={(e) => setStakingPeriod(e.target.value)}
+              step="1"
+              min="1"
+            />
           </div>
           <p className="mt-4 text-sm text-gray-500">
-            Make at least 1 GitHub commit per day for 7 days to earn rewards.
+            Make at least 1 GitHub commit per day for the staking period to earn rewards.
             Missing a day will forfeit your stake.
           </p>
         </Card>
