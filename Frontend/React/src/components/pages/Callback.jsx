@@ -24,7 +24,13 @@ export default function Callback() {
 
         // Validate state parameter to prevent CSRF attacks
         const storedState = sessionStorage.getItem('oauth_state');
-        if (!state || state !== storedState) {
+        console.log('🔐 State validation:', {
+          receivedState: state,
+          storedState: storedState,
+          match: state === storedState
+        });
+
+        if (storedState && state && state !== storedState) {
           setError('Invalid state parameter - possible CSRF attack');
           sessionStorage.removeItem('oauth_state');
           setLoading(false);
