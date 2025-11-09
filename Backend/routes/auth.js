@@ -104,19 +104,23 @@ router.post('/github', async (req, res) => {
 
     const accessToken = tokenData.access_token;
     console.log('✅ Got GitHub access token');
+    console.log('🔍 Token (first 20 chars):', accessToken.substring(0, 20) + '...');
 
     // Step 2: Fetch user data from GitHub API
     console.log('👤 Fetching user data from GitHub...');
     const userResponse = await fetch('https://api.github.com/user', {
       headers: {
-        'Authorization': `token ${accessToken}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Accept': 'application/vnd.github.v3+json',
         'User-Agent': 'GitAccountable'
       }
     });
 
     if (!userResponse.ok) {
+      const errorBody = await userResponse.text();
       console.error('❌ GitHub API error:', userResponse.status);
+      console.error('❌ Error body:', errorBody);
+      console.error('❌ Token used:', `token ${accessToken.substring(0, 20)}...`);
       return res.status(401).json({
         success: false,
         error: 'Failed to fetch user data from GitHub'

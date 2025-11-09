@@ -52,6 +52,24 @@ async function initializeDatabase() {
     await pool.query(createCommitmentsTableQuery);
     console.log('✅ Commitments table ready');
 
+    // Create commits table for tracking daily commits
+    const createCommitsTableQuery = `
+      CREATE TABLE IF NOT EXISTS commits (
+        id SERIAL PRIMARY KEY,
+        user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        github_username VARCHAR(255) NOT NULL,
+        commit_date DATE NOT NULL,
+        commit_count INT DEFAULT 1,
+        commit_hashes TEXT[] DEFAULT ARRAY[]::TEXT[],
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(user_id, commit_date)
+      );
+    `;
+
+    await pool.query(createCommitsTableQuery);
+    console.log('✅ Commits table ready');
+
     // Create indexes for faster queries
     const indexQueries = [
       'CREATE INDEX IF NOT EXISTS idx_github_id ON users(github_id);',
