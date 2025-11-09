@@ -118,24 +118,36 @@ export default function CreateCommitment() {
   return (
     <div className="page-container">
       <div className="content-width">
-        <div className="page-nav">
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+          paddingBottom: '16px',
+          borderBottom: '1px solid #334155'
+        }}>
           <button onClick={() => navigate("/")} className="link-button">
             ← Back to Home
           </button>
+          {user?.githubUsername && (
+            <span style={{ color: '#cbd5e1', fontSize: '13px' }}>
+              Logged in as <strong>@{user.githubUsername}</strong>
+            </span>
+          )}
         </div>
         <h1>Create Commitment</h1>
 
-        {/* Form Card */}
+        {/* GitHub Info Card */}
         <Card className="mb-8">
-          <h2>GitHub Information</h2>
-          <Input
-            placeholder="GitHub username"
-            value={username}
-            onChange={handleUsernameChange}
-            error={validationError}
-            success={isValid}
-            disabled={gitHubLoading}
-          />
+          <h2>Your GitHub Account</h2>
+          <div style={{ padding: '16px', backgroundColor: '#1e293b', borderRadius: '4px' }}>
+            <p style={{ color: '#cbd5e1', margin: '0 0 8px 0', fontSize: '14px' }}>
+              Connected Account
+            </p>
+            <p style={{ color: '#ffffff', margin: '0', fontSize: '18px', fontWeight: '600' }}>
+              @{user?.githubUsername || 'Not connected'}
+            </p>
+          </div>
         </Card>
 
         {/* Stake Details Card */}
