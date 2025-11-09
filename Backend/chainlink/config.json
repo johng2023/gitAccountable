@@ -1,7 +1,7 @@
 {
   "chainlinkFunctions": {
     "network": "sepolia",
-    "subscriptionId": "YOUR_SUBSCRIPTION_ID_HERE",
+    "subscriptionId": "5874",
     "donId": "fun-ethereum-sepolia-1",
     "gasLimit": 300000,
     "version": 1
@@ -15,7 +15,7 @@
     }
   },
   "commitLock": {
-    "contractAddress": "YOUR_COMMIT_LOCK_ADDRESS_HERE",
+    "contractAddress": "0x1953f602eFd1CBd16846A440421F4824024ae60c",
     "network": "sepolia",
     "stakeAmount": "0.01",
     "duration": 7

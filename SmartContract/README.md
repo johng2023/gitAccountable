@@ -88,11 +88,10 @@ forge test --match-test testCreateCommitmentStakesETHForEETH -vvv
 
 **Using Cast Wallet (Recommended - Secure):**
 
-1. Import your private key into Cast wallet (one-time setup):
+1. Verify your wallet is imported (you already have "metaMaskKey"):
 ```bash
-cast wallet import deployer --interactive
-# You'll be prompted to enter your private key and set a password
-# Your key is now stored encrypted in ~/.foundry/keystores/
+cast wallet list
+# Should show: metaMaskKey (Local)
 ```
 
 2. Set up environment variables (no PRIVATE_KEY needed!):
@@ -104,12 +103,12 @@ export ETHERSCAN_API_KEY=<your-etherscan-api-key>
 3. Deploy the contract:
 ```bash
 # Get your deployer address
-DEPLOYER_ADDRESS=$(cast wallet address --account deployer)
+DEPLOYER_ADDRESS=$(cast wallet address --account metaMaskKey)
 
 # Deploy with Cast wallet (you'll be prompted for password)
 forge script script/Deploy.s.sol:DeployCommitLock \
     --rpc-url $SEPOLIA_RPC_URL \
-    --account deployer \
+    --account metaMaskKey \
     --sender $DEPLOYER_ADDRESS \
     --broadcast \
     --verify \

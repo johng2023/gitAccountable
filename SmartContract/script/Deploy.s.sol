@@ -10,8 +10,8 @@ import "../src/CommitLock.sol";
  * @dev Deploy to Sepolia testnet with Cast wallet (secure):
  *      forge script script/Deploy.s.sol:DeployCommitLock \
  *        --rpc-url $SEPOLIA_RPC_URL \
- *        --account deployer \
- *        --sender $(cast wallet address --account deployer) \
+ *        --account metaMaskKey \
+ *        --sender $(cast wallet address --account metaMaskKey) \
  *        --broadcast \
  *        --verify \
  *        --etherscan-api-key $ETHERSCAN_API_KEY

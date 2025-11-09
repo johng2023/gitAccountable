@@ -17,17 +17,12 @@
 ```bash
 cd /Users/jacobble/gitAccountable/SmartContract
 
-# 1. Import your private key into Cast wallet (ONE-TIME SETUP - Secure!)
-cast wallet import deployer --interactive
-# Enter your private key when prompted and set a password
-# Your key is now stored ENCRYPTED in ~/.foundry/keystores/
-
-# 2. Verify your wallet was imported
+# 1. Verify your wallet is imported (you already have "metaMaskKey")
 cast wallet list
-# Should show: deployer (Local)
+# Should show: metaMaskKey (Local) ✅
 
-# 3. Get your deployer address
-cast wallet address --account deployer
+# 2. Get your deployer address
+cast wallet address --account metaMaskKey
 
 # 4. Create .env file (NO PRIVATE_KEY needed!)
 cp .env.example .env
@@ -44,8 +39,8 @@ forge test
 source .env
 forge script script/Deploy.s.sol:DeployCommitLock \
   --rpc-url $SEPOLIA_RPC_URL \
-  --account deployer \
-  --sender $(cast wallet address --account deployer) \
+  --account metaMaskKey \
+  --sender $(cast wallet address --account metaMaskKey) \
   --broadcast \
   --verify \
   --etherscan-api-key $ETHERSCAN_API_KEY \
