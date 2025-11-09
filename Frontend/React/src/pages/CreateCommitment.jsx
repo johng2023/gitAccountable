@@ -3,14 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { useCreateCommitment } from '../hooks/useCreateCommitment';
 import { useIsCommitmentActive } from '../hooks/useCommitment';
+import { useGitHubAuth } from '../hooks/useGitHubAuth';
 import { STAKE_AMOUNT, DURATION_DAYS } from '../config/contracts';
+import ConnectGitHub from '../components/ConnectGitHub';
 
 export default function CreateCommitment() {
   const [githubUsername, setGithubUsername] = useState('');
+  const [manualEntry, setManualEntry] = useState(false);
   const navigate = useNavigate();
   const { address } = useAccount();
 
   const isActive = useIsCommitmentActive(address);
+  const { githubData, isConnected: isGitHubConnected } = useGitHubAuth();
   const {
     createCommitment,
     hash,
@@ -20,6 +24,11 @@ export default function CreateCommitment() {
     error,
   } = useCreateCommitment();
 
+  // Auto-fill username from GitHub connection
+  const effectiveUsername = isGitHubConnected && githubData && !manualEntry
+    ? githubData.username
+    : githubUsername;
+
   // Redirect to dashboard after confirmation
   if (isConfirmed) {
     setTimeout(() => navigate('/dashboard'), 2000);
@@ -27,11 +36,11 @@ export default function CreateCommitment() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!githubUsername.trim()) {
-      alert('Please enter your GitHub username');
+    if (!effectiveUsername.trim()) {
+      alert('Please connect GitHub or enter your GitHub username');
       return;
     }
-    createCommitment(githubUsername.trim());
+    createCommitment(effectiveUsername.trim());
   };
 
   // If user already has active commitment
@@ -64,23 +73,64 @@ export default function CreateCommitment() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* GitHub Username Input */}
+          {/* GitHub Connection Section */}
           <div>
-            <label htmlFor="github" className="block text-sm font-medium mb-2">
-              GitHub Username
+            <label className="block text-sm font-medium mb-3">
+              GitHub Account
             </label>
-            <input
-              type="text"
-              id="github"
-              value={githubUsername}
-              onChange={(e) => setGithubUsername(e.target.value)}
-              placeholder="octocat"
-              className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-              disabled={isPending || isConfirming}
-            />
-            <p className="text-gray-500 text-sm mt-2">
-              We'll track commits from this GitHub account
-            </p>
+
+            {/* Show GitHub connection component */}
+            {!manualEntry && (
+              <div className="mb-4">
+                <ConnectGitHub showDetails={true} />
+              </div>
+            )}
+
+            {/* If GitHub connected, show username (read-only) */}
+            {isGitHubConnected && githubData && !manualEntry ? (
+              <div className="bg-green-900/20 border border-green-700 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-400 mb-1">Tracking commits from:</p>
+                    <p className="text-xl font-bold text-white">{githubData.username}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setManualEntry(true)}
+                    className="text-sm text-blue-400 hover:text-blue-300"
+                  >
+                    Enter manually
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Manual username entry (fallback) */
+              <div>
+                <input
+                  type="text"
+                  id="github"
+                  value={githubUsername}
+                  onChange={(e) => setGithubUsername(e.target.value)}
+                  placeholder="octocat"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  disabled={isPending || isConfirming}
+                />
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-gray-500 text-sm">
+                    We'll track commits from this GitHub account
+                  </p>
+                  {isGitHubConnected && manualEntry && (
+                    <button
+                      type="button"
+                      onClick={() => setManualEntry(false)}
+                      className="text-sm text-blue-400 hover:text-blue-300"
+                    >
+                      Use connected account
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Commitment Details */}
@@ -115,13 +165,22 @@ export default function CreateCommitment() {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isPending || isConfirming || !githubUsername.trim()}
+            disabled={isPending || isConfirming || !effectiveUsername.trim()}
             className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
           >
             {isPending && 'Waiting for approval...'}
             {isConfirming && 'Confirming transaction...'}
             {!isPending && !isConfirming && 'Lock It In & Start Earning'}
           </button>
+
+          {/* GitHub connection reminder */}
+          {!isGitHubConnected && !manualEntry && (
+            <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4">
+              <p className="text-sm text-blue-400">
+                💡 <strong>Tip:</strong> Connect your GitHub account above for automatic username verification!
+              </p>
+            </div>
+          )}
         </form>
 
         {/* Transaction Status */}
