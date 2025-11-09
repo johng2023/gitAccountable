@@ -1,0 +1,12 @@
+# Compiler files
+cache/
+out/
+
+# Ignores development broadcast logs
+broadcast/
+
+# Ignores node_modules
+node_modules/
+
+# Others
+.env
