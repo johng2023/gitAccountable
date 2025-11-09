@@ -1,15 +1,16 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { motion } from 'framer-motion';
 import { useCreateCommitment } from '../hooks/useCreateCommitment';
 import { useIsCommitmentActive } from '../hooks/useCommitment';
 import { useGitHubAuth } from '../hooks/useGitHubAuth';
-import { STAKE_AMOUNT, DURATION_DAYS } from '../config/contracts';
+import { STAKE_AMOUNT, DURATION_DAYS, COMMIT_LOCK_ADDRESS } from '../config/contracts';
 import ConnectGitHub from '../components/ConnectGitHub';
 
 export default function CreateCommitment() {
   const navigate = useNavigate();
   const { address } = useAccount();
+  const [searchParams] = useSearchParams();
 
   const isActive = useIsCommitmentActive(address);
   const { githubData, isConnected: isGitHubConnected } = useGitHubAuth();
@@ -22,8 +23,10 @@ export default function CreateCommitment() {
     error,
   } = useCreateCommitment();
 
-  // Get username from GitHub connection
-  const effectiveUsername = isGitHubConnected && githubData ? githubData.username : '';
+  // Get username from URL query param OR GitHub connection (fallback chain)
+  const queryUsername = searchParams.get('github-username');
+  const storedUsername = isGitHubConnected && githubData ? githubData.username : '';
+  const effectiveUsername = queryUsername || storedUsername;
 
   // Redirect to dashboard after confirmation
   if (isConfirmed) {
@@ -100,6 +103,19 @@ export default function CreateCommitment() {
       animate="visible"
     >
       <div className="max-w-2xl mx-auto px-6 py-12">
+        {/* Debug Info - Show if contract address is misconfigured */}
+        {COMMIT_LOCK_ADDRESS === '0x0000000000000000000000000000000000000000' && (
+          <motion.div
+            className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 mb-6"
+            variants={itemVariants}
+          >
+            <p className="text-sm text-red-400">
+              ⚠️ <strong>Configuration Error:</strong> Contract address not configured.
+              Please set <code className="bg-slate-800 px-2 py-1 rounded">VITE_COMMIT_LOCK_ADDRESS</code> environment variable.
+            </p>
+          </motion.div>
+        )}
+
         <motion.div
           className="border border-slate-700 rounded-lg p-8"
           variants={itemVariants}
@@ -160,11 +176,18 @@ export default function CreateCommitment() {
             {!isPending && !isConfirming && 'Lock It In & Start Earning'}
           </motion.button>
 
-          {/* GitHub connection reminder */}
-          {!isGitHubConnected && (
+          {/* GitHub connection status */}
+          {!effectiveUsername.trim() && (
             <motion.div className="bg-orange-500/10 border border-orange-500/50 rounded-lg p-4" variants={itemVariants}>
               <p className="text-sm text-orange-400">
                 💡 <strong>Tip:</strong> Connect your GitHub account above to enable commitment tracking!
+              </p>
+            </motion.div>
+          )}
+          {queryUsername && (
+            <motion.div className="bg-blue-500/10 border border-blue-500/50 rounded-lg p-4" variants={itemVariants}>
+              <p className="text-sm text-blue-400">
+                ℹ️ <strong>GitHub Username from URL:</strong> {queryUsername}
               </p>
             </motion.div>
           )}

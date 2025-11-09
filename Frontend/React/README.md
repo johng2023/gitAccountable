@@ -1,16 +1,43 @@
-# React + Vite
+# GitAccountable Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend for GitAccountable - blockchain-based GitHub commit accountability with Ether.Fi staking.
 
-Currently, two official plugins are available:
+## Quick Start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+npm install
+cp .env.example .env  # Configure environment variables
+npm run dev
+```
 
-## React Compiler
+## Environment Variables (CRITICAL for Vercel)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Required in `.env` file AND Vercel environment variables:**
 
-## Expanding the ESLint configuration
+```env
+VITE_COMMIT_LOCK_ADDRESS=0x1953f602eFd1CBd16846A440421F4824024ae60c
+VITE_WALLETCONNECT_PROJECT_ID=your_project_id_here
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Setting Up in Vercel
+
+1. Go to **Project Settings** → **Environment Variables**
+2. Add both variables above
+3. Apply to: **Production**, **Preview**, **Development**
+4. **Redeploy** after adding variables
+
+## Troubleshooting "Not Returning Data" Error
+
+If you see this error on your deployed Vercel app:
+
+1. **Check Vercel environment variables are set** (most common issue)
+2. **Check browser console** for contract/API errors
+3. **URL query parameter support**: You can pass GitHub username via `/create?github-username=yourname`
+4. **Contract address warning**: If you see a red "Configuration Error" banner, env var is missing
+
+## Tech Stack
+
+- React 18 + Vite
+- Wagmi v2 + RainbowKit (Web3)
+- Tailwind CSS v4
+- Framer Motion
