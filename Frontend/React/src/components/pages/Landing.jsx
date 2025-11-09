@@ -18,7 +18,7 @@ export default function Landing() {
   useEffect(() => {
     if (isConnected && address && !commitment && user?.githubUsername) {
       let isMounted = true;
-      getCommitment(address)
+      getCommitment(user.githubUsername, address)
         .then((data) => {
           if (isMounted && data) {
             setCommitment(data);
@@ -33,7 +33,7 @@ export default function Landing() {
         isMounted = false;
       };
     }
-  }, [isConnected, address, user?.githubUsername]); // Only redirect if both wallet AND GitHub are connected
+  }, [isConnected, address, user?.githubUsername, commitment, navigate, getCommitment, setCommitment]); // Only redirect if both wallet AND GitHub are connected
 
   return (
     <div className="hero-section">
