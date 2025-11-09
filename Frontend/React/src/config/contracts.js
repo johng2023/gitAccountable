@@ -212,10 +212,10 @@ export const COMMIT_LOCK_ABI = [
   }
 ];
 
-// Ether.Fi contracts on Sepolia
+// Mock Ether.Fi contracts on Sepolia (deployed Nov 9, 2025)
 export const ETHER_FI_CONTRACTS = {
-  liquidityPool: '0x308861A430be4cce5502d0A12724771Fc6DaF216',
-  eeth: '0x35fa164735182dE5081f8E82e824cBfb9B6118aC',
+  liquidityPool: '0x4EE63901CA7504dAfE0DAC6e3C88651e42CaAcbB',
+  eeth: '0xBa3F4d7388182A22efaabe5cD76157426ccA4EB5',
 };
 
 // Constants

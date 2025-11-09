@@ -40,10 +40,10 @@ contract CommitLock {
     uint256 public constant STAKE_AMOUNT = 0.01 ether;
     uint256 public constant DURATION = 7 days;
 
-    // Ether.Fi Contract Addresses (Ethereum Mainnet)
-    // Note: Update these for Sepolia testnet deployment
-    ILiquidityPool public constant LIQUIDITY_POOL = ILiquidityPool(0x308861A430be4cce5502d0A12724771Fc6DaF216);
-    IERC20 public constant EETH = IERC20(0x35fa164735182dE5081f8E82e824cBfb9B6118aC);
+    // Mock Ether.Fi Contract Addresses (Sepolia Testnet)
+    // Using mock contracts for testing - deployed to Sepolia Nov 9, 2025
+    ILiquidityPool public constant LIQUIDITY_POOL = ILiquidityPool(0x4EE63901CA7504dAfE0DAC6e3C88651e42CaAcbB);
+    IERC20 public constant EETH = IERC20(0xBa3F4d7388182A22efaabe5cD76157426ccA4EB5);
 
     // ============ Events ============
 
