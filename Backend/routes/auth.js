@@ -1,9 +1,65 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const fetch = require('node-fetch');
-const { query } = require('../db');
 
 const router = express.Router();
+
+// Temporary in-memory user storage (fallback if database fails)
+const users = new Map();
+let userIdCounter = 1;
+
+// Try to use database, but have fallback
+let useDatabase = true;
+
+async function saveUser(userData) {
+  try {
+    const { query } = require('../db');
+
+    const upsertQuery = `
+      INSERT INTO users (
+        github_id,
+        github_username,
+        email,
+        avatar_url,
+        github_oauth_token,
+        created_at,
+        updated_at
+      ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+      ON CONFLICT (github_id)
+      DO UPDATE SET
+        email = $3,
+        avatar_url = $4,
+        github_oauth_token = $5,
+        updated_at = NOW()
+      RETURNING id, github_id, github_username, email, avatar_url;
+    `;
+
+    const result = await query(upsertQuery, [
+      userData.github_id,
+      userData.github_username,
+      userData.email,
+      userData.avatar_url,
+      userData.github_oauth_token
+    ]);
+
+    return result.rows[0];
+  } catch (dbError) {
+    console.warn('⚠️ Database error, using in-memory storage:', dbError.message);
+    useDatabase = false;
+
+    // Fallback: use in-memory storage
+    const userId = userData.id || userIdCounter++;
+    const user = {
+      id: userId,
+      github_id: userData.github_id,
+      github_username: userData.github_username,
+      email: userData.email,
+      avatar_url: userData.avatar_url
+    };
+    users.set(userData.github_id, user);
+    return user;
+  }
+}
 
 // GitHub OAuth callback handler
 router.post('/github', async (req, res) => {
@@ -69,37 +125,17 @@ router.post('/github', async (req, res) => {
     const githubUser = await userResponse.json();
     console.log(`✅ Got GitHub user: ${githubUser.login}`);
 
-    // Step 3: Save or update user in database
-    console.log('💾 Saving user to database...');
-    const upsertQuery = `
-      INSERT INTO users (
-        github_id,
-        github_username,
-        email,
-        avatar_url,
-        github_oauth_token,
-        created_at,
-        updated_at
-      ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-      ON CONFLICT (github_id)
-      DO UPDATE SET
-        email = $3,
-        avatar_url = $4,
-        github_oauth_token = $5,
-        updated_at = NOW()
-      RETURNING id, github_id, github_username, email, avatar_url;
-    `;
+    // Step 3: Save or update user (with database fallback)
+    console.log('💾 Saving user...');
+    const user = await saveUser({
+      github_id: githubUser.id,
+      github_username: githubUser.login,
+      email: githubUser.email,
+      avatar_url: githubUser.avatar_url,
+      github_oauth_token: accessToken
+    });
 
-    const result = await query(upsertQuery, [
-      githubUser.id,
-      githubUser.login,
-      githubUser.email,
-      githubUser.avatar_url,
-      accessToken
-    ]);
-
-    const user = result.rows[0];
-    console.log(`✅ User saved to database (ID: ${user.id})`);
+    console.log(`✅ User saved (ID: ${user.id})`);
 
     // Step 4: Create JWT token
     const jwtToken = jwt.sign(
